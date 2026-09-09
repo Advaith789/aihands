@@ -127,34 +127,55 @@ python scripts/make_evidence.py    # regenerates everything in evidence/ from re
 
 ## How it works
 
+Two modes, and one file between them.
+
 ```mermaid
 flowchart TB
-  G["A goal, in English"] --> A1
-  A1["MODE A · DISCOVERY<br/>a model drives the real UI<br/>runs once per job"]
-  A1 --> A2["Distil the run into a capability file"]
-  A2 --> Q{"Can it change money?"}
-  Q -->|no| B1
-  Q -->|yes| S["A person reads the steps and signs"]
-  S --> B1
-  B1["MODE B · REPLAY<br/>follow the saved steps<br/>no model, every time after"]
-  B1 --> O["Success · a business answer · or a failure"]
-  B1 -.->|cannot continue| H["A person takes the live session"]
-  H -.->|hands back| B1
+  AG["AI agent (not ours)<br/>decides WHAT to do"]
+  AG --> A
+  AG --> B
+  A["MODE A · DISCOVERY<br/>first time — no capability yet<br/>goal in English · model in the loop<br/>slow, costs a few cents"]
+  B["MODE B · REPLAY<br/>every time after<br/>capability id + params · no model at all<br/>fast, free, repeatable"]
+  A -->|succeeds| ART[("THE ARTIFACT — a capability<br/>typed · versioned · JSON on disk")]
+  ART -->|saved once, replayed forever| B
 ```
 
-Discovery is slow, costs a few cents, and happens **once**. Replay is fast, free, and
-happens forever. The file in the middle is the product.
+**Mode A runs once per job.** You give it a goal in English. A model looks at the screen,
+picks one action, we do it, and we look again — until the job is done. Then the whole
+recording is boiled down into one file.
 
-The reason for the split is not cost, it is **determinism**. A model asked the same
-question twice may answer differently, and nobody lets that near a real account. So the
-model runs once, under supervision, and what it worked out becomes something a reviewer can
-read and a machine can repeat exactly.
+**Mode B runs every time after.** An agent hands us that file and some parameters. We follow
+the saved steps. There is no model anywhere in this path — a test walks the import graph and
+fails if one becomes reachable, and every result comes back stamped `llm_calls: 0`.
+
+**The file in the middle is the product.** It is plain JSON a person can read in a pull
+request: the steps, several ways to find each control, what to check after each one, what the
+application may legitimately answer, and who approved it.
+
+The reason for splitting it this way is not cost — it is **repeatability**. Ask a model the
+same question twice and it may answer differently, and nobody lets that near a real account.
+So the model runs once, watched, and what it worked out becomes something a reviewer can read
+and a machine can repeat exactly.
 
 ---
 
-### Teaching it a job — discovery
+### Mode A · Discovery
 
-![Discovery sequence](docs/discovery.png)
+![Discovery](docs/discovery.png)
+
+1. A person gives the goal and the parameters.
+2. We read the screen and hand up **named controls** — never markup. The model refers to
+   things by reference, so it could not write a selector if it wanted to.
+3. Rules try to pick the next action first. They only act when exactly one thing matches.
+4. If the screen is ambiguous the rules decline, and the model decides — and is told *why*
+   they declined.
+5. **Before acting**, we measure how that control could be found again: build every plausible
+   description and run each against the live page. Only the ones matching exactly one thing
+   survive. This has to happen first, because a click navigates away and the element is gone.
+6. Do it, see the next screen, write down what ran.
+7. When the goal is met, the recording is distilled into a capability — saved as **draft**.
+
+<details><summary>diagram source</summary>
 
 ```mermaid
 sequenceDiagram
@@ -179,19 +200,28 @@ sequenceDiagram
   Discovery->>Discovery: distil the recording into a capability
   Discovery-->>Person: saved as draft, awaiting approval
 ```
-
-The model never sees markup — only named controls, and it refers to them by reference. It
-could not write a selector if it wanted to.
-
-Step 6 is the one that matters. We measure how to find that control again *before* acting
-on it, because a click navigates away and the element is gone. A description we never tried
-is a guess.
+</details>
 
 ---
 
-### Running it — replay
+### Mode B · Replay
 
-![Replay sequence](docs/replay.png)
+![Replay](docs/replay.png)
+
+1. An agent asks for the capability with its parameters.
+2. We check the allowlist, the approval, and the parameter types — **before opening a
+   browser**, so anything wrong costs nothing to refuse.
+3. Then, per step: find the control by walking the recorded descriptions best-first, act, and
+   check we landed where we expected.
+4. The order inside that loop matters. We ask what the application **said** before asserting
+   where we **are**. "No member found" is an answer; treating it as a broken assertion would
+   bury a routine result in an alert queue.
+5. If we cannot safely continue, a person takes the same live browser, does the part
+   automation cannot, and hands it back. We verify before carrying on.
+6. One typed result: a success, a business answer, or a failure with the step, what we
+   expected and what we saw.
+
+<details><summary>diagram source</summary>
 
 ```mermaid
 sequenceDiagram
@@ -221,56 +251,29 @@ sequenceDiagram
   end
   Replay-->>Agent: success, business answer, or failure
 ```
-
-Steps 2 and 3 happen before a browser is opened, so a capability that is unapproved, points
-somewhere it should not, or was called with a bad member id costs nothing to refuse.
-
-Inside the loop the order matters: we ask what the application *said* before asserting where
-we *are*. "No member found" is an answer; treating it as a broken assertion would bury a
-routine result in an alert queue.
+</details>
 
 ---
 
 ### The distiller
 
-The piece between the two modes, and the one that makes a recording reusable.
-
-A recording is a list of things that happened to one member on one afternoon. A capability
-is a contract. Turning one into the other is four jobs:
+The piece between the two modes, and the one that makes a recording reusable. A recording is
+a list of things that happened to one member on one afternoon; a capability is a contract.
+Turning one into the other is four jobs:
 
 | | |
 |---|---|
 | **Parameterise** | `"M-1001"` becomes `{{ input.member_id }}`, and `/member/M-1001` becomes a pattern. Without this the recipe can only ever open one member's record. |
-| **Keep only what was measured** | Every locator was tried against the live page while recording. Anything that matched more than one element is dropped, and if a step has nothing left the whole run is refused rather than saved. |
-| **Derive the checks** | What must be true after each step: the URL we reached, the text only the right screen shows, or — for typing — that the field now holds what we typed. |
-| **Infer the contract** | Types, patterns and descriptions are read off the run. A value typed on the sign-in screen is treated as a credential, so it gets no example and no pattern written into the file. |
+| **Keep only what was measured** | Every description was tried against the live page while recording. Anything matching more than one element is dropped, and if a step has nothing left the whole run is refused rather than saved. |
+| **Derive the checks** | What must be true after each step: the URL we reached, text only the right screen shows, or — for typing — that the field now holds what we typed. |
+| **Infer the contract** | Types, patterns and descriptions are read off the run. A value typed on the sign-in screen is treated as a credential, so it gets no example and no pattern written into a committed file. |
 
-It is a pure function with no browser and no model in it, which is why we can improve how
-locators are chosen and re-distil last month's recordings for free — and why the judgement
-that matters most here is testable without a live page.
+It is a pure function — no browser, no model — which is why we can improve how descriptions
+are chosen and re-distil last month's recordings for free, and why the judgement that matters
+most here is testable without a live page.
 
----
-
-### Where the data goes
-
-```mermaid
-flowchart TD
-  UI[Legacy UI] -->|screen| P[Perception]
-  P -->|controls + readouts| PL[Planner<br/>rules, then a model]
-  PL -->|one action| EX[Executor]
-  EX -->|click / type / read| UI
-  EX --> TR[Trace + measured locators]
-  TR --> DS[Distiller]
-  DS --> CAP[(Capability file)]
-  PAR[Params from an agent] --> RE[Replay engine]
-  CAP --> RE
-  RE --> UI
-  RE --> RES[Result: success, answer, or failure]
-  RE --> EV[Evidence: log, screenshots]
-```
-
-The design decisions, the trade-offs, and the things I got wrong are in
-[REPORT.md](REPORT.md). Real output from real runs is in [evidence/](evidence/).
+The design decisions, the trade-offs, and the things I got wrong are in [REPORT.md](REPORT.md).
+Real output from real runs is in [evidence/](evidence/).
 
 ---
 
