@@ -134,13 +134,13 @@ flowchart TB
   AG["AI agent (not ours)<br/>decides WHAT to do"]
   AG -->|first time| A
   AG -->|after that| B
-  A["MODE A · DISCOVERY<br/>goal in English<br/>model in the loop<br/>slow, costs cents"]
+  A["MODE A · DISCOVERY<br/>a goal + parameters<br/>model in the loop<br/>slow (v cheap)"]
   B["MODE B · REPLAY<br/>id + parameters<br/>no model at all<br/>fast, free, exact"]
   A -->|succeeds| ART[("THE ARTIFACT<br/>typed · versioned<br/>JSON on disk")]
   ART -->|replayed forever| B
 ```
 
-**Mode A runs once per job.** You give it a goal in English. A model looks at the screen,
+**Mode A runs once per job.** You give it a goal and the parameters. A model looks at the screen,
 picks one action, we do it, and we look again — until the job is done. Then the whole
 recording is boiled down into one file.
 
@@ -186,7 +186,7 @@ sequenceDiagram
   participant Surface
   participant App as Legacy app
 
-  Person->>Discovery: goal in English + parameters
+  Person->>Discovery: the goal + parameters
   loop until the goal is met
     Discovery->>Surface: what is on screen?
     Surface-->>Discovery: named controls, no markup
