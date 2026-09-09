@@ -1,8 +1,8 @@
 {
-  "run_id": "10_refused_bad_input_20260909T033652Z_863bb3",
+  "run_id": "10_refused_bad_input_20260909T043338Z_26ad33",
   "capability_id": "mendota.member.open_savings_subaccount",
   "capability_version": "1.0.0",
-  "started_at": "2026-09-09T03:36:53.017205+00:00",
+  "started_at": "2026-09-09T04:33:38.837152+00:00",
   "duration_ms": 0,
   "category": "HARD",
   "code": "INVALID_INPUT",

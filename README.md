@@ -119,7 +119,7 @@ intervention request.
 ### Tests and evidence
 
 ```bash
-pytest -q                          # 186 tests
+pytest -q                          # 187 tests
 python scripts/make_evidence.py    # regenerates everything in evidence/ from real runs
 ```
 

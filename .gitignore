@@ -10,3 +10,5 @@ dist/
 .pytest_cache/
 **/.DS_Store
 Assignment A — Computer-Use Automation System.pdf
+# the assignment brief is interface.ai's document, not mine to publish
+Assignment*.pdf

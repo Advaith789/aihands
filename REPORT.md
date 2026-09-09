@@ -4,7 +4,8 @@ A model works out how to do a job through a UI **once**. That run is distilled i
 artifact. From then on the job runs from the artifact with no model deciding anything.
 Everything hard here is about what happens when reality does not match the recording.
 
-Numbers are from the runs in `evidence/`.
+Numbers below are from the runs committed in `evidence/`. The fastest way to check any claim
+in here is `evidence/README.md`, which says what each run demonstrates.
 
 ---
 
@@ -249,6 +250,29 @@ seeing who they were. A test asserts a live run never writes a sensitive paramet
 clear anywhere in its evidence, and it caught a real leak: redaction began at the first
 *artifact*, so the first *run* — the one that goes into evidence — wrote the operator id in
 plain text.
+
+**Where this model stops working.** Four limits I would want stated before anyone relied on it.
+
+The allowlist is a host list, so it stops the automation leaving the institution — it does
+nothing about acting on the wrong *record* inside it. A capability approved for member
+servicing can be invoked with any member id the caller supplies, and nothing here checks that
+the caller was entitled to that member. Authorisation of the *request* belongs to the agent
+calling us, and I have not built it.
+
+Risk classification leans on wording. `commits` is read off the wire and is solid, but whether
+a committing step counts as *risky* is decided by matching the operator's verb patterns against
+a sentence a model wrote. An action described blandly enough slips through as safe. It would be
+better derived from the request itself — which endpoint, which method — and that is where I
+would take it next.
+
+Approval covers the steps, not the world they run in. The hash detects an edited artifact. It
+cannot detect the application changing underneath an artifact that is still byte-identical, and
+that is the likelier failure at scale. Drift is measured and reported; nothing acts on it yet.
+
+And redaction is a boundary, not a guarantee. It masks what the capability declares sensitive
+plus what matches a known shape. A secret in an undeclared field with an unusual format would
+pass through — which is why the target application has no real data in it and why the tests
+assert the absence rather than trusting the implementation.
 
 ---
 

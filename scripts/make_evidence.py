@@ -135,7 +135,12 @@ async def main() -> None:
         policy=policy, app="mendota", input_specs=SPECS)
     path = ROOT / "capabilities" / f"{CAP_ID}.json"
     path.write_text(json.dumps(capability.model_dump(mode="json"), indent=2))
-    print(f"  compiled -> {path.relative_to(ROOT)} ({len(capability.steps)} steps, draft)")
+    # A copy sits in evidence/ too: the brief asks for the artifact next to the
+    # runs that produced and exercised it, so a reviewer can read all three
+    # without going looking for it.
+    (ROOT / "evidence" / "capability.json").write_text(
+        json.dumps(capability.model_dump(mode="json"), indent=2))
+    print(f"  distilled -> {path.relative_to(ROOT)} ({len(capability.steps)} steps, draft)")
 
     print("\nreplay")
     await replay("04_replay_refused_while_draft", capability, {**OP, "member_id": "M-1001",

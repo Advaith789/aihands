@@ -1,9 +1,9 @@
 {
-  "run_id": "06_answer_member_not_found_20260909T033648Z_c217fd",
+  "run_id": "06_answer_member_not_found_20260909T043334Z_c19e47",
   "capability_id": "mendota.member.open_savings_subaccount",
   "capability_version": "1.0.0",
-  "started_at": "2026-09-09T03:36:49.072186+00:00",
-  "duration_ms": 319,
+  "started_at": "2026-09-09T04:33:34.817262+00:00",
+  "duration_ms": 391,
   "category": "BUSINESS",
   "code": "RECORD_NOT_FOUND",
   "outputs": {},
@@ -19,7 +19,7 @@
       "step_id": "s1",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 27,
+      "duration_ms": 25,
       "resolved_by": "role_name",
       "candidate_index": 0
     },
@@ -27,7 +27,7 @@
       "step_id": "s2",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 167,
+      "duration_ms": 150,
       "resolved_by": "role_name",
       "candidate_index": 0
     },
@@ -35,7 +35,7 @@
       "step_id": "s3",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 27,
+      "duration_ms": 26,
       "resolved_by": "role_name",
       "candidate_index": 0
     }

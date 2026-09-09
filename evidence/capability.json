@@ -709,10 +709,10 @@
     "restart_only_before_first_mutation": true
   },
   "approval": {
-    "status": "approved",
-    "approved_by": "reviewer@mendota",
-    "approved_at": "2026-09-09T04:35:28.547807+00:00",
-    "approved_steps_hash": "649250ac4567e5b872b0fc492019c79ed9ce3e4b5773a0db18f4ba86aec5e3ba",
+    "status": "draft",
+    "approved_by": null,
+    "approved_at": null,
+    "approved_steps_hash": null,
     "derived_via_overlay": null
   },
   "provenance": {

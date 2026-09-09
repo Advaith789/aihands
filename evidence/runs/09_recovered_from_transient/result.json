@@ -1,9 +1,9 @@
 {
-  "run_id": "09_recovered_from_transient_20260909T033650Z_b99e6c",
+  "run_id": "09_recovered_from_transient_20260909T043336Z_da0762",
   "capability_id": "mendota.member.open_savings_subaccount",
   "capability_version": "1.0.0",
-  "started_at": "2026-09-09T03:36:51.257508+00:00",
-  "duration_ms": 1465,
+  "started_at": "2026-09-09T04:33:37.088358+00:00",
+  "duration_ms": 1447,
   "category": "SUCCESS",
   "code": "NONE",
   "outputs": {
@@ -24,7 +24,7 @@
       "step_id": "s2",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 171,
+      "duration_ms": 164,
       "resolved_by": "role_name",
       "candidate_index": 0
     },
@@ -32,7 +32,7 @@
       "step_id": "s3",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 27,
+      "duration_ms": 25,
       "resolved_by": "role_name",
       "candidate_index": 0
     },
@@ -40,7 +40,7 @@
       "step_id": "s4",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 85,
+      "duration_ms": 92,
       "resolved_by": "role_name",
       "candidate_index": 0
     },
@@ -56,7 +56,7 @@
       "step_id": "s6",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 89,
+      "duration_ms": 75,
       "resolved_by": "role_name",
       "candidate_index": 0
     },
@@ -72,7 +72,7 @@
       "step_id": "s8",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 67,
+      "duration_ms": 68,
       "resolved_by": "role_name",
       "candidate_index": 0
     },
