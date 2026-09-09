@@ -633,7 +633,7 @@
       "category_override": null
     },
     {
-      "name": "deposit_rejected",
+      "name": "deposit_below_minimum",
       "code": "VALIDATION_REJECTED",
       "detect": {
         "kind": "text_present",
@@ -643,7 +643,23 @@
           "main"
         ]
       },
-      "message": "The institution declined the opening deposit amount.",
+      "message": "The opening deposit is below the institution's minimum.",
+      "remediate": "none",
+      "max_attempts": 2,
+      "category_override": null
+    },
+    {
+      "name": "deposit_above_maximum",
+      "code": "VALIDATION_REJECTED",
+      "detect": {
+        "kind": "text_present",
+        "value": "Opening deposit may not exceed",
+        "target": null,
+        "frame_path": [
+          "main"
+        ]
+      },
+      "message": "The opening deposit is above the institution's maximum.",
       "remediate": "none",
       "max_attempts": 2,
       "category_override": null
@@ -716,7 +732,7 @@
     "derived_via_overlay": null
   },
   "provenance": {
-    "recorded_at": "2026-09-09T06:00:19.231474+00:00",
+    "recorded_at": "2026-09-09T06:11:11.814522+00:00",
     "planner": "ladder",
     "model": "gpt-4o-mini",
     "run_id": "",

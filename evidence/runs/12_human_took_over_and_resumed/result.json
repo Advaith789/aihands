@@ -1,9 +1,9 @@
 {
-  "run_id": "12_human_took_over_and_resumed_20260909T060026Z_287ba7",
+  "run_id": "12_human_took_over_and_resumed_20260909T061119Z_902981",
   "capability_id": "mendota.member.open_savings_subaccount",
   "capability_version": "1.0.0",
-  "started_at": "2026-09-09T06:00:26.869608+00:00",
-  "duration_ms": 1663,
+  "started_at": "2026-09-09T06:11:19.480456+00:00",
+  "duration_ms": 1677,
   "category": "SUCCESS",
   "code": "NONE",
   "outputs": {
@@ -16,7 +16,7 @@
       "step_id": "s1",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 27,
+      "duration_ms": 26,
       "resolved_by": "role_name",
       "candidate_index": 0
     },
@@ -24,7 +24,7 @@
       "step_id": "s2",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 163,
+      "duration_ms": 151,
       "resolved_by": "role_name",
       "candidate_index": 0
     },
@@ -32,7 +32,7 @@
       "step_id": "s3",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 25,
+      "duration_ms": 49,
       "resolved_by": "role_name",
       "candidate_index": 0
     },
@@ -40,7 +40,7 @@
       "step_id": "s4",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 109,
+      "duration_ms": 104,
       "resolved_by": "role_name",
       "candidate_index": 0
     },
@@ -48,7 +48,7 @@
       "step_id": "s5",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 54,
+      "duration_ms": 53,
       "resolved_by": "column_text",
       "candidate_index": 0
     },
@@ -56,7 +56,7 @@
       "step_id": "s6",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 67,
+      "duration_ms": 66,
       "resolved_by": "role_name",
       "candidate_index": 0
     },
@@ -72,7 +72,7 @@
       "step_id": "s9",
       "status": "ok",
       "attempts": 1,
-      "duration_ms": 11,
+      "duration_ms": 13,
       "resolved_by": "row_label",
       "candidate_index": 0
     }

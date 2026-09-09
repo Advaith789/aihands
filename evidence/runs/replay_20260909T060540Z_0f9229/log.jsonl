@@ -1,3 +1,0 @@
-{"t_ms": 0, "at": "2026-09-09T06:05:40.174139+00:00", "run_id": "replay_20260909T060540Z_0f9229", "event": "replay.start", "capability": "<redacted:0e4874f4>", "schema_version": "1.0.0", "params": {"operator_id": "<redacted:854b2ed9>", "member_id": "M-1001", "deposit": "500"}, "approved": false, "mutating": true}
-{"t_ms": 1, "at": "2026-09-09T06:05:40.174591+00:00", "run_id": "replay_20260909T060540Z_0f9229", "event": "replay.refused", "code": "NOT_APPROVED", "message": "the approval on file does not match the current steps; refusing to replay unattended"}
-{"t_ms": 1, "at": "2026-09-09T06:05:40.175123+00:00", "run_id": "replay_20260909T060540Z_0f9229", "event": "replay.finish", "summary": "HARD: NOT_APPROVED"}

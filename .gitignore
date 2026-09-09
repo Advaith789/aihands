@@ -12,3 +12,9 @@ dist/
 Assignment A — Computer-Use Automation System.pdf
 # the assignment brief is interface.ai's document, not mine to publish
 Assignment*.pdf
+
+# Evidence is a curated deliverable: the numbered runs make_evidence.py produces.
+# Ad-hoc runs from ordinary CLI use land here too and must not be committed --
+# four of them slipped in before this rule existed.
+evidence/runs/*
+!evidence/runs/[0-9][0-9]_*

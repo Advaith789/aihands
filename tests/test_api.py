@@ -117,3 +117,18 @@ def test_acting_on_an_unknown_run_is_a_404(client):
 def test_the_console_renders(client):
     page = client.get("/")
     assert page.status_code == 200 and "aihands" in page.text
+
+
+def test_a_broken_capability_file_warns_but_does_not_hide_the_others(tmp_path, capsys):
+    """Skipping in silence means a capability vanishes with no explanation,
+    which is worse than the error it was avoiding."""
+    import json
+    from aihands.api import store
+    broken = store.CAPABILITY_DIR / "_broken_for_test.json"
+    broken.write_text("{ not json")
+    try:
+        loaded = store.load_all()
+        assert CAP in loaded, "one bad file hid the whole catalogue"
+        assert "_broken_for_test" in capsys.readouterr().err
+    finally:
+        broken.unlink()

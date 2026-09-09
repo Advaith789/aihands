@@ -343,7 +343,7 @@
       "tool": "click",
       "tier": "llm",
       "intent": "Open the sub-account for the member.",
-      "rationale": "I need to open a sub-account for the member with ID M-1001.",
+      "rationale": "I need to open a savings sub-account for the member with ID M-1001.",
       "ref": "f2:c1",
       "value": "",
       "into": "",
@@ -618,8 +618,8 @@
       "seq": 10,
       "tool": "read",
       "tier": "llm",
-      "intent": "Read the member's name to confirm the correct member is displayed.",
-      "rationale": "I need to confirm that the member with ID M-1001 is correctly identified before proceeding with the account opening.",
+      "intent": "Read the member information to confirm the correct member is displayed.",
+      "rationale": "I need to confirm that the member with ID M-1001 is correctly displayed before proceeding with the account opening.",
       "ref": "f1:c1",
       "value": "",
       "into": "Member",
@@ -685,6 +685,6 @@
     }
   ],
   "status": "complete",
-  "summary": "all declared outputs captured",
+  "summary": "All necessary outputs have been captured, including the confirmation number.",
   "llm_calls": 11
 }

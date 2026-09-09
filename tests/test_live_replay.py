@@ -178,3 +178,43 @@ def test_an_unknown_tenant_names_the_ones_that_exist(capability):
         load_for(capability, "nowhere")
     message = str(raised.value)
     assert "nowhere" in message and "available" in message
+
+
+@pytest.mark.parametrize("deposit,outcome", [
+    (10, "deposit_below_minimum"),
+    (-500, "deposit_below_minimum"),
+    (999_999_999, "deposit_above_maximum"),
+])
+async def test_both_ends_of_a_validation_rule_are_business_answers(
+        surface, approved, reset, deposit, outcome):
+    """The institution declines an amount two different ways.
+
+    Declaring only the lower bound left the upper one falling through to
+    CHECKPOINT_FAILED -- the exact mistake the brief names, in the case I had
+    not thought to try. And a detector broad enough to catch both also matches
+    the field's own label, so it fired on every healthy form. Two entries, each
+    matching its own sentence.
+    """
+    reset()
+    r = await _run(surface, approved, {**OP, "member_id": "M-1001", "deposit": deposit})
+    assert r.category is Category.BUSINESS, r.error
+    assert r.code is Code.VALIDATION_REJECTED
+    assert r.outcome.name == outcome
+
+
+async def test_an_empty_required_parameter_never_reaches_the_browser(surface, approved):
+    # An empty string is not a value. Passing one on to a login form reports
+    # the resulting confusion as a missed checkpoint three steps later.
+    r = await _run(surface, approved, {"operator_id": "", "member_id": "M-1001",
+                                       "deposit": 500})
+    assert r.code is Code.INVALID_INPUT and r.steps == []
+
+
+@pytest.mark.parametrize("member,deposit", [(" M-1001 ", 500), ("M-1001", "  500  ")])
+async def test_parameters_are_trimmed_before_they_are_judged(
+        surface, approved, reset, member, deposit):
+    # Values arrive through shells, forms and JSON. " M-1001 " is the member id
+    # it obviously is, not a pattern failure the caller cannot see.
+    reset()
+    r = await _run(surface, approved, {**OP, "member_id": member, "deposit": deposit})
+    assert r.category is Category.SUCCESS, r.error

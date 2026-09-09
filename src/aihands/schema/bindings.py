@@ -64,11 +64,19 @@ def validate_inputs(capability: Capability, params: dict[str, Any]) -> dict[str,
 
     bound: dict[str, Any] = {}
     for name, spec in declared.items():
-        if name not in params or params[name] is None:
+        raw = params.get(name)
+        if isinstance(raw, str):
+            # Callers pass values through shells, forms and JSON. Trimming here
+            # means " M-1001 " is the member id it obviously is, rather than a
+            # pattern failure the caller cannot see.
+            raw = raw.strip()
+        # An empty string is not a value. Treating it as one sends a blank
+        # credential to a login form and reports the resulting confusion as a
+        # missed checkpoint three steps later.
+        if raw is None or (isinstance(raw, str) and not raw):
             if spec.required:
                 raise InvalidInput(f"missing required parameter {name!r}")
             continue
-        raw = params[name]
         try:
             if spec.type == "number":
                 value: Any = float(raw)

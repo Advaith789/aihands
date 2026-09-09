@@ -32,13 +32,22 @@
       "message": "This member's record may not be serviced this way."
     },
     {
-      "name": "deposit_rejected",
+      "name": "deposit_below_minimum",
       "code": "VALIDATION_REJECTED",
       "detect": {
         "kind": "text_present",
         "value": "Opening deposit must be at least"
       },
-      "message": "The institution declined the opening deposit amount."
+      "message": "The opening deposit is below the institution's minimum."
+    },
+    {
+      "name": "deposit_above_maximum",
+      "code": "VALIDATION_REJECTED",
+      "detect": {
+        "kind": "text_present",
+        "value": "Opening deposit may not exceed"
+      },
+      "message": "The opening deposit is above the institution's maximum."
     },
     {
       "name": "dual_approval_required",
