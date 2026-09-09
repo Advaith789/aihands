@@ -146,7 +146,7 @@
       "tool": "fill",
       "tier": "llm",
       "intent": "Enter the member ID to search for the member.",
-      "rationale": "I need to fill in the member ID to locate the member in the system.",
+      "rationale": "I need to fill in the member ID to locate the member before proceeding.",
       "ref": "f2:c1",
       "value": "M-1001",
       "into": "",

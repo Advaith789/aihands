@@ -42,7 +42,7 @@ Confirm the install with the test suite — it starts the target applications it
 are not already running:
 
 ```bash
-pytest -q          # 195 tests, about 30 seconds
+pytest -q          # 200 tests, about 30 seconds
 ```
 
 ### About the API key
@@ -145,7 +145,7 @@ intervention request.
 ### Tests and evidence
 
 ```bash
-pytest -q                          # 195 tests
+pytest -q                          # 200 tests
 python scripts/make_evidence.py    # regenerates everything in evidence/ from real runs
 ```
 

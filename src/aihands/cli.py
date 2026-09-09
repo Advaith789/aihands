@@ -114,7 +114,11 @@ async def _replay(args) -> int:
     except KeyError:
         print(f"no capability {args.capability!r}", file=sys.stderr)
         return 2
-    capability = load_for(capability, args.tenant)
+    try:
+        capability = load_for(capability, args.tenant)
+    except KeyError as exc:
+        print(exc, file=sys.stderr)
+        return 2
 
     surface = await WebSurface.launch(headless=not args.headed)
     try:

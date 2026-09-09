@@ -134,3 +134,47 @@ async def test_discovery_redacts_from_the_very_first_run(surface, reset, tmp_pat
     assert "OP-77" not in written
     assert "<redacted:" in written
     assert "M-1001" in written, "only what was declared sensitive should be masked"
+
+
+async def test_an_unreachable_application_is_a_clear_error_not_a_stack_trace(
+        surface, approved):
+    """The first mistake anyone makes is forgetting to start the target app.
+
+    A Playwright traceback tells them nothing they can act on. The assignment
+    asks for failures that surface a clear, debuggable error, and this is the
+    one most likely to be seen.
+    """
+    from aihands.schema.outcomes import Code
+    unreachable = approved.model_copy(
+        update={"entry_url": "http://127.0.0.1:8099/login".replace("8099", "8099"),
+                "safety": approved.safety})
+    # point it somewhere allowed by policy but with nothing listening
+    import json
+    from aihands.schema.capability import Capability, Safety
+    dead = Capability.model_validate({
+        **json.loads(unreachable.model_dump_json()),
+        "entry_url": "http://localhost:8098/login",
+        "safety": Safety(allowed_hosts=("localhost:8098",), max_steps=20).model_dump(),
+    })
+    import aihands.surface.web_surface as ws
+    original = ws.WebSurface.goto
+
+    async def refuse(self, url):
+        raise ConnectionError("connection refused")
+
+    ws.WebSurface.goto = refuse
+    try:
+        r = await _run(surface, dead, {**OP, "member_id": "M-1001", "deposit": 500})
+    finally:
+        ws.WebSurface.goto = original
+    assert r.code is Code.SURFACE_ERROR
+    assert "is the target application running" in r.error.message
+
+
+def test_an_unknown_tenant_names_the_ones_that_exist(capability):
+    from aihands.tenancy import load_for
+    import pytest as _pytest
+    with _pytest.raises(KeyError) as raised:
+        load_for(capability, "nowhere")
+    message = str(raised.value)
+    assert "nowhere" in message and "available" in message

@@ -31,6 +31,20 @@ def new_run_id(kind: str) -> str:
     return f"{kind}_{stamp}_{uuid.uuid4().hex[:6]}"
 
 
+def _ref(path: Path) -> str:
+    """How a path is written down in evidence.
+
+    Relative to where the process was started, when the file is underneath it.
+    An absolute path records the machine that happened to produce the run --
+    useless to anyone reading it later, and it publishes somebody's home
+    directory into a repository.
+    """
+    try:
+        return str(path.resolve().relative_to(Path.cwd().resolve()))
+    except ValueError:
+        return str(path)
+
+
 class RunRecorder:
     def __init__(self, run_id: str, root: Path | None = None,
                  redactor: Redactor | None = None, dirname: str | None = None) -> None:
@@ -58,16 +72,16 @@ class RunRecorder:
             fh.write(line + "\n")
             fh.flush()
 
-    def write_json(self, name: str, payload: Any) -> Path:
+    def write_json(self, name: str, payload: Any) -> str:
         path = self.dir / name
         body = payload.model_dump(mode="json") if hasattr(payload, "model_dump") else payload
         path.write_text(json.dumps(self.redactor.value(body), indent=2, default=str))
-        return path
+        return _ref(path)
 
-    def write_text(self, name: str, text: str) -> Path:
+    def write_text(self, name: str, text: str) -> str:
         path = self.dir / name
         path.write_text(self.redactor.text(text))
-        return path
+        return _ref(path)
 
     async def capture(self, surface: Any, label: str) -> dict[str, str]:
         """The richer signal the assignment asks for on failure.
@@ -80,17 +94,17 @@ class RunRecorder:
         try:
             png = self.dir / f"{label}.png"
             await surface.page.screenshot(path=str(png), full_page=True)
-            out["screenshot"] = str(png)
+            out["screenshot"] = _ref(png)
         except Exception:
             pass
         try:
             obs = await surface.observe()
-            out["observation"] = str(self.write_text(f"{label}.observation.txt", obs.render()))
+            out["observation"] = self.write_text(f"{label}.observation.txt", obs.render())
         except Exception:
             pass
         try:
             html = await surface.page.content()
-            out["dom_snapshot"] = str(self.write_text(f"{label}.dom.html", html))
+            out["dom_snapshot"] = self.write_text(f"{label}.dom.html", html)
         except Exception:
             pass
         return out

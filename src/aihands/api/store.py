@@ -8,6 +8,7 @@ and putting it behind a schema migration would take that away.
 from __future__ import annotations
 
 import json
+import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -29,8 +30,13 @@ def load_all() -> dict[str, tuple[Capability, Path]]:
     for path in _files():
         try:
             cap = Capability.model_validate(json.loads(path.read_text()))
-        except Exception:
-            continue          # a malformed file is not a reason to hide the rest
+        except Exception as exc:
+            # One malformed file should not hide the rest of the catalogue --
+            # but skipping it in silence means a capability vanishes with no
+            # explanation, which is worse than the error it was avoiding.
+            print(f"warning: skipping {path} — {type(exc).__name__}: "
+                  f"{str(exc).splitlines()[0][:120]}", file=sys.stderr)
+            continue
         out[cap.capability_id] = (cap, path)
     return out
 

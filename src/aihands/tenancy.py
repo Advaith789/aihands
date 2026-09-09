@@ -39,6 +39,13 @@ from .schema.capability import Approval, Capability, Safety, Step, Target
 OVERLAY_DIR = Path("capabilities/overlays")
 
 
+class UnknownTenant(KeyError):
+    """Names the tenants that do exist, so the fix is obvious from the message."""
+
+    def __str__(self) -> str:            # KeyError otherwise quotes the message
+        return self.args[0]
+
+
 class Alias(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -63,9 +70,14 @@ class Overlay(BaseModel):
 
     @classmethod
     def load(cls, tenant: str, directory: Path | None = None) -> "Overlay":
-        path = (directory or OVERLAY_DIR) / f"{tenant}.json"
+        folder = directory or OVERLAY_DIR
+        path = folder / f"{tenant}.json"
         if not path.exists():
-            raise KeyError(f"no overlay for tenant {tenant!r}")
+            known = sorted(p.stem for p in folder.glob("*.json")) if folder.exists() else []
+            raise UnknownTenant(
+                f"no overlay for tenant {tenant!r}"
+                + (f"; available: {', '.join(known)}" if known else
+                   f"; none found in {folder}/"))
         return cls.model_validate(json.loads(path.read_text()))
 
     # ------------------------------------------------------------------

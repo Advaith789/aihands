@@ -70,3 +70,21 @@ def test_listing_the_catalogue_works_from_the_command_line():
                           cwd=ROOT, timeout=60)
     assert done.returncode == 0, done.stderr
     assert "open_savings_subaccount" in done.stdout
+
+
+@pytest.mark.skipif(not BIN.exists(), reason="console script not installed")
+@pytest.mark.parametrize("args", [
+    ["replay", "does.not.exist", "--param", "a=1"],
+    ["replay", "mendota.member.open_savings_subaccount", "--tenant", "nowhere",
+     "--param", "operator_id=OP-77", "--param", "member_id=M-1001", "--param", "deposit=500"],
+    ["approve", "does.not.exist"],
+])
+def test_no_command_ever_answers_with_a_stack_trace(args):
+    """A traceback is not an error message. Every failure a reviewer can
+    trigger from the command line should say what went wrong in one line."""
+    done = subprocess.run([str(BIN), *args], capture_output=True, text=True,
+                          cwd=ROOT, timeout=90)
+    combined = done.stdout + done.stderr
+    assert "Traceback" not in combined, combined[-400:]
+    assert done.returncode != 0
+    assert combined.strip(), "failed silently"

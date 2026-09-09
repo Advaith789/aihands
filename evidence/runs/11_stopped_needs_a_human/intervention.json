@@ -6,8 +6,8 @@
   "goal": "Open a savings sub-account for a member",
   "frame_url": "http://127.0.0.1:8099/member/M-1005/subaccount",
   "evidence": {
-    "screenshot": "/Users/advaith789/Documents/agentic-ai/aihands/evidence/runs/11_stopped_needs_a_human/escalation_s8.png",
-    "observation": "/Users/advaith789/Documents/agentic-ai/aihands/evidence/runs/11_stopped_needs_a_human/escalation_s8.observation.txt",
-    "dom_snapshot": "/Users/advaith789/Documents/agentic-ai/aihands/evidence/runs/11_stopped_needs_a_human/escalation_s8.dom.html"
+    "screenshot": "evidence/runs/11_stopped_needs_a_human/escalation_s8.png",
+    "observation": "evidence/runs/11_stopped_needs_a_human/escalation_s8.observation.txt",
+    "dom_snapshot": "evidence/runs/11_stopped_needs_a_human/escalation_s8.dom.html"
   }
 }

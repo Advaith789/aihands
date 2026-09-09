@@ -146,7 +146,7 @@
       "tool": "fill",
       "tier": "llm",
       "intent": "Enter the member ID to search for the member.",
-      "rationale": "I need to fill in the member ID to proceed with finding the member.",
+      "rationale": "I need to fill in the member ID to find the specific member in the system.",
       "ref": "f2:c1",
       "value": "M-1001",
       "into": "",
@@ -283,8 +283,8 @@
       "seq": 5,
       "tool": "click",
       "tier": "llm",
-      "intent": "Open the member's record for M-1001.",
-      "rationale": "I need to access the member's details to proceed with opening a savings sub-account.",
+      "intent": "Open the member's account details for M-1001.",
+      "rationale": "I need to access the member's account to proceed with opening a savings sub-account.",
       "ref": "f2:c3",
       "value": "",
       "into": "",
@@ -343,7 +343,7 @@
       "tool": "click",
       "tier": "llm",
       "intent": "Open the sub-account for the member.",
-      "rationale": "I need to open a savings sub-account for the member with ID M-1001.",
+      "rationale": "I need to open a sub-account for the member with ID M-1001.",
       "ref": "f2:c1",
       "value": "",
       "into": "",
@@ -411,8 +411,8 @@
       "seq": 7,
       "tool": "fill",
       "tier": "llm",
-      "intent": "Enter the opening deposit amount for the new savings sub-account.",
-      "rationale": "I need to fill in the opening deposit amount before submitting the request to create the savings sub-account.",
+      "intent": "Fill in the opening deposit for the new savings sub-account.",
+      "rationale": "I need to specify the opening deposit amount before submitting the request.",
       "ref": "f2:c1",
       "value": "500",
       "into": "",
@@ -550,7 +550,7 @@
       "tool": "read",
       "tier": "llm",
       "intent": "Read the confirmation number from the receipt.",
-      "rationale": "The confirmation number is now visible in the readouts, and I need to capture it as part of the goal.",
+      "rationale": "The confirmation number is needed to complete the goal of opening a savings sub-account.",
       "ref": "f1:c1",
       "value": "",
       "into": "confirmation_number",
@@ -619,7 +619,7 @@
       "tool": "read",
       "tier": "llm",
       "intent": "Read the member's name to confirm the correct member is displayed.",
-      "rationale": "I need to confirm that the member with ID M-1001 is displayed before proceeding with the account opening.",
+      "rationale": "I need to confirm that the member with ID M-1001 is correctly identified before proceeding with the account opening.",
       "ref": "f1:c1",
       "value": "",
       "into": "Member",
@@ -682,60 +682,9 @@
       "committed": false,
       "status": "ok",
       "error": null
-    },
-    {
-      "seq": 11,
-      "tool": "read",
-      "tier": "llm",
-      "intent": "Read the confirmation number from the receipt.",
-      "rationale": "The confirmation number is needed to complete the process of opening the savings sub-account.",
-      "ref": "f2:r1",
-      "value": "",
-      "into": "confirmation_number",
-      "url_before": "http://127.0.0.1:8099/member/M-1001/subaccount",
-      "url_after": "http://127.0.0.1:8099/member/M-1001/subaccount",
-      "frame_path": [
-        "main"
-      ],
-      "content_frame_after": [
-        "main"
-      ],
-      "control": {
-        "ref": "f2:r1",
-        "label": "Confirmation Number",
-        "value": "SAV-88200",
-        "frame_path": [
-          "main"
-        ]
-      },
-      "probes": [
-        {
-          "locator": {
-            "strategy": "row_label",
-            "label": "Confirmation Number",
-            "confidence": 0.85
-          },
-          "matched_at_record": 1,
-          "reverified": true
-        },
-        {
-          "locator": {
-            "strategy": "css",
-            "value": "tr:nth-of-type(2) > td > table > tbody > tr:nth-of-type(2) > td:nth-of-type(2)",
-            "confidence": 0.3
-          },
-          "matched_at_record": 1,
-          "reverified": true
-        }
-      ],
-      "read_value": "SAV-88200",
-      "landmark_after": "Confirmation Number",
-      "committed": false,
-      "status": "ok",
-      "error": null
     }
   ],
   "status": "complete",
   "summary": "all declared outputs captured",
-  "llm_calls": 12
+  "llm_calls": 11
 }

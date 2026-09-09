@@ -163,7 +163,18 @@ class ReplayEngine:
             return finish(Category.HARD, Code.INVALID_INPUT,
                           error=ErrorDetail(code=Code.INVALID_INPUT, message=exc.message))
 
-        await self.surface.goto(capability.entry_url)
+        try:
+            await self.surface.goto(capability.entry_url)
+        except Exception as exc:
+            # Almost always "the target application is not running". A stack
+            # trace tells the caller nothing they can act on, and this is the
+            # first error anybody is going to hit.
+            message = (f"could not reach {capability.entry_url} — is the target "
+                       f"application running? ({type(exc).__name__})")
+            self.recorder.log("replay.unreachable", url=capability.entry_url,
+                              error=str(exc)[:200])
+            return finish(Category.HARD, Code.SURFACE_ERROR,
+                          error=ErrorDetail(code=Code.SURFACE_ERROR, message=message))
 
         # -- phase 3: walk the steps ------------------------------------
         index, restarts = 0, 0
