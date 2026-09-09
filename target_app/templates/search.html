@@ -1,0 +1,35 @@
+{% extends "_base.html" %}{% block content %}
+<b>{{ t.member_word }} Search</b>
+<form method="get" action="/search">
+  <table cellpadding="4" cellspacing="0" border="0">
+    <tr>
+      <td><label for="mid">{{ t.member_id_label }}</label></td>
+      <td><input type="text" name="member_id" id="mid" size="18" value="{{ query }}"></td>
+      <td><input type="submit" value="{{ t.search_button }}"></td>
+    </tr>
+  </table>
+</form>
+
+{% if not_found %}
+  <table cellpadding="8" cellspacing="0" border="0" style="background:#fff4e2;border:1px solid #e0c088;">
+    <tr><td>No {{ t.member_word|lower }} found for &quot;{{ query }}&quot;.</td></tr>
+  </table>
+{% elif results %}
+  {# The row is a <td onclick>. No anchor, no button, no role, no name.
+     An accessibility tree does not see a control here, and neither does a
+     fixed list of control-ish tags. The only way through this screen is to
+     notice the click handler and name the row from its own cells. #}
+  <table cellpadding="5" cellspacing="0" border="1" bordercolor="#b9c2cc" style="background:#fff;">
+    <tr bgcolor="#d8dee6">
+      <td><b>{{ t.member_id_label }}</b></td><td><b>Name</b></td><td><b>Status</b></td>
+    </tr>
+    {% for m in results %}
+    <tr>
+      <td onclick="window.location='/member/{{ m.member_id }}'" style="cursor:pointer;color:#1d3557;">{{ m.member_id }}</td>
+      <td onclick="window.location='/member/{{ m.member_id }}'" style="cursor:pointer;">{{ m.name }}</td>
+      <td>{{ m.status }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endif %}
+{% endblock %}

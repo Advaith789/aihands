@@ -1,0 +1,18 @@
+{% extends "_base.html" %}{% block content %}
+<b>{{ t.member_word }} Record</b>
+<table cellpadding="4" cellspacing="0" border="0" style="background:#fff;border:1px solid #b9c2cc;">
+  <tr><td>{{ t.member_id_label }}</td><td><b>{{ m.member_id }}</b></td></tr>
+  <tr><td>Name</td><td>{{ m.name }}</td></tr>
+  <tr><td>Status</td><td>{{ m.status }}</td></tr>
+</table>
+<br>
+<b>Accounts</b>
+<table cellpadding="5" cellspacing="0" border="1" bordercolor="#b9c2cc" style="background:#fff;">
+  <tr bgcolor="#d8dee6"><td><b>Number</b></td><td><b>Type</b></td><td><b>Balance</b></td></tr>
+  {% for a in m.accounts %}
+  <tr><td>{{ a.number }}</td><td>{{ a.kind }}</td><td>${{ '%.2f'|format(a.balance) }}</td></tr>
+  {% endfor %}
+</table>
+<br>
+<a href="/member/{{ m.member_id }}/subaccount/new">{{ t.open_button }}</a>
+{% endblock %}

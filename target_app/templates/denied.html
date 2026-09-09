@@ -1,0 +1,8 @@
+{% extends "_base.html" %}{% block content %}
+<table cellpadding="8" cellspacing="0" border="0" style="background:#fdeaec;border:1px solid #d99;">
+  <tr><td style="color:#a01722;">
+    This {{ t.member_word|lower }} record is {{ m.status }}. Opening a
+    {{ t.subaccount_word|lower }} is not permitted for this operator.
+  </td></tr>
+</table>
+{% endblock %}

@@ -1,0 +1,10 @@
+{# A real frameset. Every control the automation needs lives inside the "main"
+   frame, so nothing is reachable without a frame path. #}
+<html>
+<head><title>{{ t.display_name }} Servicing Desk</title></head>
+<frameset cols="180,*" border="1" frameborder="1">
+  <frame name="sidebar" src="/desk/nav" scrolling="no">
+  <frame name="main" src="/desk/main">
+  <noframes><body>This terminal requires frame support.</body></noframes>
+</frameset>
+</html>

@@ -1,0 +1,31 @@
+# Deployment safety policy.
+#
+# This file is the operator's, not the agent's. Nothing the model produces and
+# no artifact loaded from disk can widen it -- a capability may only ever be
+# narrower. An agent that can edit its own allowlist does not have one.
+#
+# Defaults are deny-shaped on purpose. A permissive default that everyone
+# ships is not a control, and this is regulated financial software.
+
+allowed_hosts:
+  - "127.0.0.1:8099"     # Mendota
+  - "127.0.0.1:8098"     # Presidio
+  - "localhost:8099"
+  - "localhost:8098"
+
+allowed_actions: [navigate, click, fill, read, wait]
+
+# Anything that can change the institution's state. Matched against the step's
+# stated intent as well as its action type, so a click described as "authorise
+# the transfer" is risky even if the recorder classified it as ordinary.
+risky_intent_patterns:
+  - "(?i)\\b(approve|authorise|authorize|submit|confirm|transfer|delete|close|remove|pay|post)\\b"
+
+# block   -- refuse the step outright
+# confirm -- run it only if the capability is approved AND the caller opted in;
+#            otherwise pause and ask a human on the live session
+# allow   -- run it (not recommended outside a sandbox)
+risky_action_policy: confirm
+
+max_steps: 40
+max_run_seconds: 180

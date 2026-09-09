@@ -1,0 +1,8 @@
+URL: http://127.0.0.1:8099/desk
+  frame sidebar: http://127.0.0.1:8099/desk/nav
+  frame main: http://127.0.0.1:8099/member/M-1005/subaccount
+TITLE: Lake Mendota Credit Union Servicing Desk
+CONTROLS:
+  [f1:c1] link "Member Search" frame=sidebar
+  [f2:c1] textbox "Approver ID" frame=main
+  [f2:c2] button "Authorise" value='Authorise' frame=main

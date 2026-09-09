@@ -1,0 +1,3 @@
+{"t_ms": 279, "at": "2026-09-09T00:30:30.183038+00:00", "run_id": "replay_draft_refused_20260909T003029Z_935398", "event": "replay.start", "capability": "<redacted:0e4874f4>", "schema_version": "1.0.0", "params": {"operator_id": "<redacted:854b2ed9>", "member_id": "M-1001", "deposit": 500}, "approved": false, "mutating": true}
+{"t_ms": 279, "at": "2026-09-09T00:30:30.183326+00:00", "run_id": "replay_draft_refused_20260909T003029Z_935398", "event": "replay.refused", "code": "NOT_APPROVED", "message": "this capability changes state and has never been approved; refusing to replay unattended"}
+{"t_ms": 279, "at": "2026-09-09T00:30:30.183687+00:00", "run_id": "replay_draft_refused_20260909T003029Z_935398", "event": "replay.finish", "summary": "HARD: NOT_APPROVED"}

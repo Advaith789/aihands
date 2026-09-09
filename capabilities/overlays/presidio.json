@@ -1,0 +1,23 @@
+{
+  "tenant": "presidio",
+  "entry_url": "http://127.0.0.1:8098/login",
+  "allowed_hosts": ["127.0.0.1:8098"],
+  "aliases": [
+    {"match": {"strategy": "role_name", "name": "Member ID"},
+     "add": {"strategy": "role_name", "role": "textbox", "name": "Shareholder Number", "exact": true, "confidence": 0.9}},
+    {"match": {"strategy": "label", "text": "Member ID"},
+     "add": {"strategy": "label", "text": "Shareholder Number", "confidence": 0.85}},
+    {"match": {"strategy": "role_name", "name": "Find Member"},
+     "add": {"strategy": "role_name", "role": "button", "name": "Locate", "exact": true, "confidence": 0.9}},
+    {"match": {"strategy": "column_text", "column": "Member ID"},
+     "add": {"strategy": "column_text", "text": "{{ input.member_id }}", "column": "Shareholder Number", "confidence": 0.8}},
+    {"match": {"strategy": "role_name", "name": "Open Sub-Account"},
+     "add": {"strategy": "role_name", "role": "link", "name": "Create Linked Account", "exact": true, "confidence": 0.9}},
+    {"match": {"strategy": "role_name", "name": "Opening Deposit"},
+     "add": {"strategy": "role_name", "role": "textbox", "name": "Initial Funding", "exact": true, "confidence": 0.9}},
+    {"match": {"strategy": "label", "text": "Opening Deposit"},
+     "add": {"strategy": "label", "text": "Initial Funding", "confidence": 0.85}},
+    {"match": {"strategy": "role_name", "name": "Submit Request"},
+     "add": {"strategy": "role_name", "role": "button", "name": "Send for Processing", "exact": true, "confidence": 0.9}}
+  ]
+}

@@ -1,0 +1,17 @@
+{% extends "_base.html" %}{% block content %}
+<b>{{ t.open_button }} &mdash; {{ m.name }}</b>
+{% if error %}
+<table cellpadding="8" cellspacing="0" border="0" style="background:#fdeaec;border:1px solid #d99;">
+  <tr><td style="color:#a01722;">{{ error }}</td></tr>
+</table>
+{% endif %}
+<form method="post" action="/member/{{ m.member_id }}/subaccount">
+  <table cellpadding="4" cellspacing="0" border="0">
+    <tr>
+      <td><label for="amt">{{ t.amount_label }}</label></td>
+      <td><input type="text" name="amount" id="amt" size="14" value="{{ amount }}"></td>
+    </tr>
+    <tr><td colspan="2"><input type="submit" value="{{ t.submit_button }}"></td></tr>
+  </table>
+</form>
+{% endblock %}

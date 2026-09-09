@@ -1,0 +1,22 @@
+{% extends "_base.html" %}{% block content %}
+{# Conditional screen: appears only above the tenant's approval threshold.
+   A recorded flow must tolerate this being absent on other inputs. #}
+<table cellpadding="10" cellspacing="0" border="1" bordercolor="#e0c088" style="background:#fff8ec;">
+  <tr><td><b>Second Approval Required</b></td></tr>
+  <tr><td>
+    An opening deposit of ${{ '%.2f'|format(amount) }} for {{ m.name }} exceeds the
+    threshold for a single operator. A second approver must authorise it.
+  </td></tr>
+  {% if error is defined and error %}
+  <tr><td style="color:#a01722;">{{ error }}</td></tr>
+  {% endif %}
+  <tr><td>
+    <form method="post" action="/member/{{ m.member_id }}/subaccount/approve">
+      <input type="hidden" name="amount" value="{{ amount }}">
+      <label for="apv">Approver ID</label>
+      <input type="text" name="approver" id="apv" size="18">
+      <input type="submit" value="Authorise">
+    </form>
+  </td></tr>
+</table>
+{% endblock %}

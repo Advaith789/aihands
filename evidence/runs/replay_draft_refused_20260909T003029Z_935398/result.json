@@ -1,0 +1,32 @@
+{
+  "run_id": "replay_draft_refused_20260909T003029Z_935398",
+  "capability_id": "mendota.member.open_savings_subaccount",
+  "capability_version": "1.0.0",
+  "started_at": "2026-09-09T00:30:30.182977+00:00",
+  "duration_ms": 0,
+  "category": "HARD",
+  "code": "NOT_APPROVED",
+  "outputs": {},
+  "outcome": null,
+  "error": {
+    "code": "NOT_APPROVED",
+    "message": "this capability changes state and has never been approved; refusing to replay unattended",
+    "step_id": null,
+    "expected": null,
+    "observed": null,
+    "evidence": null
+  },
+  "steps": [],
+  "control": {
+    "escalated": false,
+    "escalations": 0,
+    "human_actions": 0,
+    "final_owner": "nobody"
+  },
+  "drift": {
+    "steps_resolved": 0,
+    "first_choice": 0,
+    "fell_back": 0
+  },
+  "llm_calls": 0
+}

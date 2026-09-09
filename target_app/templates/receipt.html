@@ -1,0 +1,9 @@
+{% extends "_base.html" %}{% block content %}
+<table cellpadding="10" cellspacing="0" border="1" bordercolor="#7fae7f" style="background:#f2f9f2;">
+  <tr><td><b>{{ t.subaccount_word }} Opened</b></td></tr>
+  <tr><td>Confirmation Number</td><td><b>{{ account.number }}</b></td></tr>
+  <tr><td>{{ t.member_word }}</td><td>{{ m.name }} ({{ m.member_id }})</td></tr>
+  <tr><td>Opening Balance</td><td>${{ '%.2f'|format(account.balance) }}</td></tr>
+  {% if approver %}<tr><td>Approved By</td><td>{{ approver }}</td></tr>{% endif %}
+</table>
+{% endblock %}

@@ -1,0 +1,603 @@
+{
+  "goal": "Sign in to the servicing desk, find the member with the given member id, and open a savings sub-account for them with the given opening deposit. Then read the confirmation number from the receipt.",
+  "entry_url": "http://127.0.0.1:8098/login",
+  "planner": "ladder",
+  "model": "gpt-4o-mini",
+  "params": {
+    "operator_id": "<redacted:854b2ed9>",
+    "member_id": "M-1001",
+    "deposit": "500"
+  },
+  "declared_outputs": [
+    "confirmation_number"
+  ],
+  "tenant": "presidio",
+  "entries": [
+    {
+      "seq": 1,
+      "tool": "fill",
+      "tier": "heuristic",
+      "intent": "enter the operator id",
+      "rationale": "exactly one field matches 'operator_id'",
+      "ref": "f0:c1",
+      "value": "<redacted:854b2ed9>",
+      "into": "",
+      "url_before": "http://127.0.0.1:8098/login",
+      "url_after": "http://127.0.0.1:8098/login",
+      "frame_path": [],
+      "content_frame_after": [],
+      "control": {
+        "ref": "f0:c1",
+        "role": "textbox",
+        "name": "Operator ID",
+        "context": "",
+        "via": "semantic",
+        "tag": "input",
+        "type": "text",
+        "value": "",
+        "enabled": true,
+        "href": "",
+        "frame_path": []
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "textbox",
+            "name": "Operator ID",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "label",
+            "text": "Operator ID",
+            "confidence": 0.85
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "#op",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 2,
+      "tool": "click",
+      "tier": "heuristic",
+      "intent": "sign in",
+      "rationale": "the only button, and every field is filled",
+      "ref": "f0:c2",
+      "value": "",
+      "into": "",
+      "url_before": "http://127.0.0.1:8098/login",
+      "url_after": "http://127.0.0.1:8098/desk/main",
+      "frame_path": [],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f0:c2",
+        "role": "button",
+        "name": "Sign In",
+        "context": "",
+        "via": "semantic",
+        "tag": "input",
+        "type": "submit",
+        "value": "Sign In",
+        "enabled": true,
+        "href": "",
+        "frame_path": []
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "button",
+            "name": "Sign In",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "label",
+            "text": "Sign In",
+            "confidence": 0.85
+          },
+          "matched_at_record": 0,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "table > tbody > tr:nth-of-type(2) > td > form > input:nth-of-type(2)",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "",
+      "committed": true,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 3,
+      "tool": "fill",
+      "tier": "llm",
+      "intent": "Enter the member ID to search for the member.",
+      "rationale": "I need to fill in the member ID to locate the member before proceeding.",
+      "ref": "f2:c1",
+      "value": "M-1001",
+      "into": "",
+      "url_before": "http://127.0.0.1:8098/desk/main",
+      "url_after": "http://127.0.0.1:8098/desk/main",
+      "frame_path": [
+        "main"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f2:c1",
+        "role": "textbox",
+        "name": "Shareholder Number",
+        "context": "",
+        "via": "semantic",
+        "tag": "input",
+        "type": "text",
+        "value": "",
+        "enabled": true,
+        "href": "",
+        "frame_path": [
+          "main"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "textbox",
+            "name": "Shareholder Number",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "label",
+            "text": "Shareholder Number",
+            "confidence": 0.85
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "#mid",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 4,
+      "tool": "click",
+      "tier": "heuristic",
+      "intent": "locate",
+      "rationale": "the only button, and every field is filled",
+      "ref": "f2:c2",
+      "value": "",
+      "into": "",
+      "url_before": "http://127.0.0.1:8098/desk/main",
+      "url_after": "http://127.0.0.1:8098/search?member_id=M-1001",
+      "frame_path": [
+        "main"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f2:c2",
+        "role": "button",
+        "name": "Locate",
+        "context": "",
+        "via": "semantic",
+        "tag": "input",
+        "type": "submit",
+        "value": "Locate",
+        "enabled": true,
+        "href": "",
+        "frame_path": [
+          "main"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "button",
+            "name": "Locate",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "label",
+            "text": "Locate",
+            "confidence": 0.85
+          },
+          "matched_at_record": 0,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "form > table > tbody > tr > td:nth-of-type(3) > input",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 5,
+      "tool": "click",
+      "tier": "heuristic",
+      "intent": "open the record for M-1001",
+      "rationale": "one row matches the 'member_id' value exactly",
+      "ref": "f2:c3",
+      "value": "",
+      "into": "",
+      "url_before": "http://127.0.0.1:8098/search?member_id=M-1001",
+      "url_after": "http://127.0.0.1:8098/member/M-1001",
+      "frame_path": [
+        "main"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f2:c3",
+        "role": "clickable",
+        "name": "M-1001",
+        "context": "column \"Shareholder Number\"",
+        "via": "onclick",
+        "tag": "td",
+        "type": "",
+        "value": "",
+        "enabled": true,
+        "href": "",
+        "frame_path": [
+          "main"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "column_text",
+            "text": "M-1001",
+            "column": "Shareholder Number",
+            "confidence": 0.8
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "tr:nth-of-type(2) > td > table > tbody > tr:nth-of-type(2) > td:nth-of-type(1)",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "Shareholder Number",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 6,
+      "tool": "click",
+      "tier": "heuristic",
+      "intent": "create linked account",
+      "rationale": "the only link on this screen the goal mentions",
+      "ref": "f2:c1",
+      "value": "",
+      "into": "",
+      "url_before": "http://127.0.0.1:8098/member/M-1001",
+      "url_after": "http://127.0.0.1:8098/member/M-1001/subaccount/new",
+      "frame_path": [
+        "main"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f2:c1",
+        "role": "link",
+        "name": "Create Linked Account",
+        "context": "",
+        "via": "semantic",
+        "tag": "a",
+        "type": "",
+        "value": "",
+        "enabled": true,
+        "href": "/member/M-1001/subaccount/new",
+        "frame_path": [
+          "main"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "link",
+            "name": "Create Linked Account",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "link_text",
+            "text": "Create Linked Account",
+            "confidence": 0.75
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "table > tbody > tr:nth-of-type(2) > td > a",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 7,
+      "tool": "fill",
+      "tier": "llm",
+      "intent": "Enter the initial funding amount for the new savings sub-account.",
+      "rationale": "I need to fill in the initial funding amount before submitting the form to open the savings sub-account.",
+      "ref": "f2:c1",
+      "value": "500",
+      "into": "",
+      "url_before": "http://127.0.0.1:8098/member/M-1001/subaccount/new",
+      "url_after": "http://127.0.0.1:8098/member/M-1001/subaccount/new",
+      "frame_path": [
+        "main"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f2:c1",
+        "role": "textbox",
+        "name": "Initial Funding",
+        "context": "",
+        "via": "semantic",
+        "tag": "input",
+        "type": "text",
+        "value": "",
+        "enabled": true,
+        "href": "",
+        "frame_path": [
+          "main"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "textbox",
+            "name": "Initial Funding",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "label",
+            "text": "Initial Funding",
+            "confidence": 0.85
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "#amt",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 8,
+      "tool": "click",
+      "tier": "heuristic",
+      "intent": "send for processing",
+      "rationale": "the only button, and every field is filled",
+      "ref": "f2:c2",
+      "value": "",
+      "into": "",
+      "url_before": "http://127.0.0.1:8098/member/M-1001/subaccount/new",
+      "url_after": "http://127.0.0.1:8098/member/M-1001/subaccount",
+      "frame_path": [
+        "main"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f2:c2",
+        "role": "button",
+        "name": "Send for Processing",
+        "context": "",
+        "via": "semantic",
+        "tag": "input",
+        "type": "submit",
+        "value": "Send for Processing",
+        "enabled": true,
+        "href": "",
+        "frame_path": [
+          "main"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "button",
+            "name": "Send for Processing",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "label",
+            "text": "Send for Processing",
+            "confidence": 0.85
+          },
+          "matched_at_record": 0,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "form > table > tbody > tr:nth-of-type(2) > td > input",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "Confirmation Number",
+      "committed": true,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 9,
+      "tool": "read",
+      "tier": "heuristic",
+      "intent": "read the confirmation number",
+      "rationale": "one readout is labelled like 'confirmation_number'",
+      "ref": "f2:r1",
+      "value": "",
+      "into": "confirmation_number",
+      "url_before": "http://127.0.0.1:8098/member/M-1001/subaccount",
+      "url_after": "http://127.0.0.1:8098/member/M-1001/subaccount",
+      "frame_path": [
+        "main"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f2:r1",
+        "label": "Confirmation Number",
+        "value": "SAV-88200",
+        "frame_path": [
+          "main"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "row_label",
+            "label": "Confirmation Number",
+            "confidence": 0.85
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "tr:nth-of-type(2) > td > table > tbody > tr:nth-of-type(2) > td:nth-of-type(2)",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        }
+      ],
+      "read_value": "SAV-88200",
+      "landmark_after": "Confirmation Number",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    }
+  ],
+  "status": "complete",
+  "summary": "every declared output has been captured",
+  "llm_calls": 2
+}

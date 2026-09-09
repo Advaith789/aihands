@@ -1,0 +1,618 @@
+{
+  "schema_version": "1.0.0",
+  "capability_id": "mendota.member.open_savings_subaccount",
+  "version": "1.0.0",
+  "name": "Open a savings sub-account for a member",
+  "description": "Finds a member and opens a savings sub-account, returning the confirmation number.",
+  "entry_url": "http://127.0.0.1:8099/login",
+  "inputs": [
+    {
+      "name": "operator_id",
+      "type": "string",
+      "required": true,
+      "pattern": null,
+      "description": "Operator signing in",
+      "example": "OP-77",
+      "sensitive": true
+    },
+    {
+      "name": "member_id",
+      "type": "string",
+      "required": true,
+      "pattern": "M-\\d{4}",
+      "description": "Member to service",
+      "example": "M-1001",
+      "sensitive": false
+    },
+    {
+      "name": "deposit",
+      "type": "number",
+      "required": true,
+      "pattern": null,
+      "description": "Opening deposit in dollars",
+      "example": "500",
+      "sensitive": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "confirmation_number",
+      "type": "string",
+      "required": true,
+      "description": "Captured from the confirmation number field",
+      "sensitive": false
+    }
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "intent": "enter the operator id",
+      "action": {
+        "type": "fill",
+        "value": "{{ input.operator_id }}"
+      },
+      "target": {
+        "candidates": [
+          {
+            "strategy": "role_name",
+            "role": "textbox",
+            "name": "Operator ID",
+            "exact": true,
+            "confidence": 0.9
+          },
+          {
+            "strategy": "label",
+            "text": "Operator ID",
+            "confidence": 0.85
+          },
+          {
+            "strategy": "css",
+            "value": "#op",
+            "confidence": 0.3
+          }
+        ],
+        "frame_path": [],
+        "probe": {
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        "on_ambiguous": "fail",
+        "describe": "enter the operator id"
+      },
+      "require": null,
+      "expect": [],
+      "retry": null,
+      "risk": "safe",
+      "timeout_ms": 8000,
+      "commits": false
+    },
+    {
+      "id": "s2",
+      "intent": "sign in",
+      "action": {
+        "type": "click"
+      },
+      "target": {
+        "candidates": [
+          {
+            "strategy": "role_name",
+            "role": "button",
+            "name": "Sign In",
+            "exact": true,
+            "confidence": 0.9
+          },
+          {
+            "strategy": "css",
+            "value": "table > tbody > tr:nth-of-type(2) > td > form > input:nth-of-type(2)",
+            "confidence": 0.3
+          }
+        ],
+        "frame_path": [],
+        "probe": {
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        "on_ambiguous": "fail",
+        "describe": "sign in"
+      },
+      "require": null,
+      "expect": [
+        {
+          "kind": "frame_url_matches",
+          "value": "/desk/main(\\?|$)",
+          "target": null,
+          "frame_path": [
+            "main"
+          ]
+        }
+      ],
+      "retry": {
+        "max_attempts": 2,
+        "backoff_ms": 300
+      },
+      "risk": "safe",
+      "timeout_ms": 8000,
+      "commits": true
+    },
+    {
+      "id": "s3",
+      "intent": "enter the member id",
+      "action": {
+        "type": "fill",
+        "value": "{{ input.member_id }}"
+      },
+      "target": {
+        "candidates": [
+          {
+            "strategy": "role_name",
+            "role": "textbox",
+            "name": "Member ID",
+            "exact": true,
+            "confidence": 0.9
+          },
+          {
+            "strategy": "label",
+            "text": "Member ID",
+            "confidence": 0.85
+          },
+          {
+            "strategy": "css",
+            "value": "#mid",
+            "confidence": 0.3
+          }
+        ],
+        "frame_path": [
+          "main"
+        ],
+        "probe": {
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        "on_ambiguous": "fail",
+        "describe": "enter the member id"
+      },
+      "require": null,
+      "expect": [],
+      "retry": null,
+      "risk": "safe",
+      "timeout_ms": 8000,
+      "commits": false
+    },
+    {
+      "id": "s4",
+      "intent": "find member",
+      "action": {
+        "type": "click"
+      },
+      "target": {
+        "candidates": [
+          {
+            "strategy": "role_name",
+            "role": "button",
+            "name": "Find Member",
+            "exact": true,
+            "confidence": 0.9
+          },
+          {
+            "strategy": "css",
+            "value": "form > table > tbody > tr > td:nth-of-type(3) > input",
+            "confidence": 0.3
+          }
+        ],
+        "frame_path": [
+          "main"
+        ],
+        "probe": {
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        "on_ambiguous": "fail",
+        "describe": "find member"
+      },
+      "require": null,
+      "expect": [
+        {
+          "kind": "frame_url_matches",
+          "value": "/search(\\?|$)",
+          "target": null,
+          "frame_path": [
+            "main"
+          ]
+        }
+      ],
+      "retry": {
+        "max_attempts": 2,
+        "backoff_ms": 300
+      },
+      "risk": "safe",
+      "timeout_ms": 8000,
+      "commits": false
+    },
+    {
+      "id": "s5",
+      "intent": "open the record for M-1001",
+      "action": {
+        "type": "click"
+      },
+      "target": {
+        "candidates": [
+          {
+            "strategy": "column_text",
+            "text": "{{ input.member_id }}",
+            "column": "Member ID",
+            "confidence": 0.8
+          },
+          {
+            "strategy": "css",
+            "value": "tr:nth-of-type(2) > td > table > tbody > tr:nth-of-type(2) > td:nth-of-type(1)",
+            "confidence": 0.3
+          }
+        ],
+        "frame_path": [
+          "main"
+        ],
+        "probe": {
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        "on_ambiguous": "fail",
+        "describe": "open the record for M-1001"
+      },
+      "require": null,
+      "expect": [
+        {
+          "kind": "frame_url_matches",
+          "value": "/member/[^/?&]+(\\?|$)",
+          "target": null,
+          "frame_path": [
+            "main"
+          ]
+        }
+      ],
+      "retry": {
+        "max_attempts": 2,
+        "backoff_ms": 300
+      },
+      "risk": "safe",
+      "timeout_ms": 8000,
+      "commits": false
+    },
+    {
+      "id": "s6",
+      "intent": "open sub-account",
+      "action": {
+        "type": "click"
+      },
+      "target": {
+        "candidates": [
+          {
+            "strategy": "role_name",
+            "role": "link",
+            "name": "Open Sub-Account",
+            "exact": true,
+            "confidence": 0.9
+          },
+          {
+            "strategy": "link_text",
+            "text": "Open Sub-Account",
+            "confidence": 0.75
+          },
+          {
+            "strategy": "css",
+            "value": "table > tbody > tr:nth-of-type(2) > td > a",
+            "confidence": 0.3
+          }
+        ],
+        "frame_path": [
+          "main"
+        ],
+        "probe": {
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        "on_ambiguous": "fail",
+        "describe": "open sub-account"
+      },
+      "require": null,
+      "expect": [
+        {
+          "kind": "frame_url_matches",
+          "value": "/member/[^/?&]+/subaccount/new(\\?|$)",
+          "target": null,
+          "frame_path": [
+            "main"
+          ]
+        }
+      ],
+      "retry": {
+        "max_attempts": 2,
+        "backoff_ms": 300
+      },
+      "risk": "safe",
+      "timeout_ms": 8000,
+      "commits": false
+    },
+    {
+      "id": "s7",
+      "intent": "enter the deposit",
+      "action": {
+        "type": "fill",
+        "value": "{{ input.deposit }}"
+      },
+      "target": {
+        "candidates": [
+          {
+            "strategy": "role_name",
+            "role": "textbox",
+            "name": "Opening Deposit",
+            "exact": true,
+            "confidence": 0.9
+          },
+          {
+            "strategy": "label",
+            "text": "Opening Deposit",
+            "confidence": 0.85
+          },
+          {
+            "strategy": "css",
+            "value": "#amt",
+            "confidence": 0.3
+          }
+        ],
+        "frame_path": [
+          "main"
+        ],
+        "probe": {
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        "on_ambiguous": "fail",
+        "describe": "enter the deposit"
+      },
+      "require": null,
+      "expect": [],
+      "retry": null,
+      "risk": "safe",
+      "timeout_ms": 8000,
+      "commits": false
+    },
+    {
+      "id": "s8",
+      "intent": "submit request",
+      "action": {
+        "type": "click"
+      },
+      "target": {
+        "candidates": [
+          {
+            "strategy": "role_name",
+            "role": "button",
+            "name": "Submit Request",
+            "exact": true,
+            "confidence": 0.9
+          },
+          {
+            "strategy": "css",
+            "value": "form > table > tbody > tr:nth-of-type(2) > td > input",
+            "confidence": 0.3
+          }
+        ],
+        "frame_path": [
+          "main"
+        ],
+        "probe": {
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        "on_ambiguous": "fail",
+        "describe": "submit request"
+      },
+      "require": null,
+      "expect": [
+        {
+          "kind": "frame_url_matches",
+          "value": "/member/[^/?&]+/subaccount(\\?|$)",
+          "target": null,
+          "frame_path": [
+            "main"
+          ]
+        },
+        {
+          "kind": "text_present",
+          "value": "Confirmation Number",
+          "target": null,
+          "frame_path": [
+            "main"
+          ]
+        }
+      ],
+      "retry": {
+        "max_attempts": 2,
+        "backoff_ms": 300
+      },
+      "risk": "risky",
+      "timeout_ms": 8000,
+      "commits": true
+    },
+    {
+      "id": "s9",
+      "intent": "read the confirmation number",
+      "action": {
+        "type": "read",
+        "into": "confirmation_number",
+        "extract": null
+      },
+      "target": {
+        "candidates": [
+          {
+            "strategy": "row_label",
+            "label": "Confirmation Number",
+            "confidence": 0.85
+          },
+          {
+            "strategy": "css",
+            "value": "tr:nth-of-type(2) > td > table > tbody > tr:nth-of-type(2) > td:nth-of-type(2)",
+            "confidence": 0.3
+          }
+        ],
+        "frame_path": [
+          "main"
+        ],
+        "probe": {
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        "on_ambiguous": "fail",
+        "describe": "read the confirmation number"
+      },
+      "require": null,
+      "expect": [],
+      "retry": null,
+      "risk": "safe",
+      "timeout_ms": 8000,
+      "commits": false
+    }
+  ],
+  "outcomes": [
+    {
+      "name": "member_not_found",
+      "code": "RECORD_NOT_FOUND",
+      "detect": {
+        "kind": "text_present",
+        "value": "No member found",
+        "target": null,
+        "frame_path": [
+          "main"
+        ]
+      },
+      "message": "No member exists for that id.",
+      "remediate": "none",
+      "max_attempts": 2,
+      "category_override": null
+    },
+    {
+      "name": "already_has_savings",
+      "code": "ALREADY_SATISFIED",
+      "detect": {
+        "kind": "text_present",
+        "value": "already holds",
+        "target": null,
+        "frame_path": [
+          "main"
+        ]
+      },
+      "message": "This member already holds a savings sub-account.",
+      "remediate": "none",
+      "max_attempts": 2,
+      "category_override": null
+    },
+    {
+      "name": "member_not_permitted",
+      "code": "RECORD_NOT_PERMITTED",
+      "detect": {
+        "kind": "text_present",
+        "value": "is not permitted for this operator",
+        "target": null,
+        "frame_path": [
+          "main"
+        ]
+      },
+      "message": "This member's record may not be serviced this way.",
+      "remediate": "none",
+      "max_attempts": 2,
+      "category_override": null
+    },
+    {
+      "name": "deposit_rejected",
+      "code": "VALIDATION_REJECTED",
+      "detect": {
+        "kind": "text_present",
+        "value": "Opening deposit must be at least",
+        "target": null,
+        "frame_path": [
+          "main"
+        ]
+      },
+      "message": "The institution declined the opening deposit amount.",
+      "remediate": "none",
+      "max_attempts": 2,
+      "category_override": null
+    },
+    {
+      "name": "dual_approval_required",
+      "code": "UNEXPECTED_INTERSTITIAL",
+      "detect": {
+        "kind": "text_present",
+        "value": "Second Approval Required",
+        "target": null,
+        "frame_path": [
+          "main"
+        ]
+      },
+      "message": "A second approver is required for this amount.",
+      "remediate": "none",
+      "max_attempts": 2,
+      "category_override": null
+    },
+    {
+      "name": "record_service_down",
+      "code": "TRANSIENT_UNAVAILABLE",
+      "detect": {
+        "kind": "text_present",
+        "value": "temporarily unavailable",
+        "target": null,
+        "frame_path": [
+          "main"
+        ]
+      },
+      "message": "The record service is temporarily unavailable.",
+      "remediate": "reload",
+      "max_attempts": 3,
+      "category_override": null
+    },
+    {
+      "name": "session_expired",
+      "code": "SESSION_EXPIRED",
+      "detect": {
+        "kind": "frame_url_matches",
+        "value": "/login",
+        "target": null,
+        "frame_path": [
+          "main"
+        ]
+      },
+      "message": "The servicing session ended.",
+      "remediate": "none",
+      "max_attempts": 2,
+      "category_override": null
+    }
+  ],
+  "safety": {
+    "allowed_hosts": [
+      "127.0.0.1:8099"
+    ],
+    "max_steps": 20
+  },
+  "recovery": {
+    "global_max_retries": 4,
+    "allow_restart": true,
+    "restart_only_before_first_mutation": true
+  },
+  "approval": {
+    "status": "approved",
+    "approved_by": "reviewer@mendota",
+    "approved_at": "2026-09-09T00:30:30.200221+00:00",
+    "approved_steps_hash": "0d2ca127339595818593fbe5a6dece2c1d00af53c874f9d0c1399eed79d0508f",
+    "derived_via_overlay": null
+  },
+  "provenance": {
+    "recorded_at": "2026-09-09T00:30:29.901250+00:00",
+    "planner": "ladder",
+    "model": "gpt-4o-mini",
+    "run_id": "",
+    "tenant": "",
+    "steps_by_tier": {
+      "heuristic": 9
+    }
+  }
+}

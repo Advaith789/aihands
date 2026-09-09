@@ -1,0 +1,19 @@
+<html>
+<head><title>{{ t.display_name }} - Sign In</title></head>
+<body bgcolor="#eef1f4" style="font-family: Verdana, sans-serif; font-size: 12px;">
+<table align="center" width="380" cellpadding="8" cellspacing="0" border="0" style="margin-top:80px;background:#fff;border:1px solid #b9c2cc;">
+  <tr><td bgcolor="#1d3557" style="color:#fff;font-weight:bold;">{{ t.display_name }}</td></tr>
+  {% if reason == 'expired' %}
+  <tr><td style="color:#8a4b00;background:#fff4e2;">Your session ended. Sign in again to continue.</td></tr>
+  {% endif %}
+  {% if error %}<tr><td style="color:#a01722;">{{ error }}</td></tr>{% endif %}
+  <tr><td>
+    <form method="post" action="/login">
+      <label for="op">Operator ID</label><br>
+      <input type="text" name="operator" id="op" size="28"><br><br>
+      <input type="submit" value="Sign In">
+    </form>
+  </td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,55 @@
+{
+  "run_id": "replay_not_found_20260909T003031Z_e45e30",
+  "capability_id": "mendota.member.open_savings_subaccount",
+  "capability_version": "1.0.0",
+  "started_at": "2026-09-09T00:30:31.279461+00:00",
+  "duration_ms": 305,
+  "category": "BUSINESS",
+  "code": "RECORD_NOT_FOUND",
+  "outputs": {},
+  "outcome": {
+    "name": "member_not_found",
+    "code": "RECORD_NOT_FOUND",
+    "message": "No member exists for that id.",
+    "detail": {}
+  },
+  "error": null,
+  "steps": [
+    {
+      "step_id": "s1",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 23,
+      "resolved_by": "role_name",
+      "candidate_index": 0
+    },
+    {
+      "step_id": "s2",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 155,
+      "resolved_by": "role_name",
+      "candidate_index": 0
+    },
+    {
+      "step_id": "s3",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 26,
+      "resolved_by": "role_name",
+      "candidate_index": 0
+    }
+  ],
+  "control": {
+    "escalated": false,
+    "escalations": 0,
+    "human_actions": 0,
+    "final_owner": "nobody"
+  },
+  "drift": {
+    "steps_resolved": 4,
+    "first_choice": 4,
+    "fell_back": 0
+  },
+  "llm_calls": 0
+}
