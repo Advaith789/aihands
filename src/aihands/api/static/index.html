@@ -1,217 +1,64 @@
 <!doctype html>
-<html lang="en">
-<head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>aihands · operator console</title>
+<title>aihands operator console</title>
 <style>
-  :root{
-    --bg:#0f1115; --panel:#171a21; --line:#252a34; --ink:#e6e9ef; --dim:#8b93a3;
-    --accent:#5b9dff; --ok:#3fb950; --warn:#d29922; --bad:#f85149; --biz:#a371f7;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-       font:13px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif}
-  header{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;
-         align-items:baseline;gap:12px}
-  header h1{margin:0;font-size:15px;letter-spacing:.02em}
-  header .sub{color:var(--dim);font-size:12px}
-  main{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;padding:16px;align-items:start}
-  @media(max-width:1000px){main{grid-template-columns:1fr}}
-  section{background:var(--panel);border:1px solid var(--line);border-radius:8px}
-  section>h2{margin:0;padding:10px 14px;font-size:12px;text-transform:uppercase;
-             letter-spacing:.08em;color:var(--dim);border-bottom:1px solid var(--line)}
-  .body{padding:12px 14px}
-  .row{border-bottom:1px solid var(--line);padding:11px 14px}
-  .row:last-child{border-bottom:0}
-  .name{font-weight:600}
-  .muted{color:var(--dim)}
-  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
-  .tag{display:inline-block;padding:1px 7px;border-radius:99px;font-size:11px;
-       border:1px solid var(--line);color:var(--dim)}
-  .tag.ok{color:var(--ok);border-color:#1d3b25}
-  .tag.warn{color:var(--warn);border-color:#3d3116}
-  .tag.bad{color:var(--bad);border-color:#4b1f1d}
-  .tag.biz{color:var(--biz);border-color:#33244d}
-  button{background:#20242e;color:var(--ink);border:1px solid var(--line);
-         border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer}
-  button:hover{border-color:var(--accent)}
-  button.primary{background:var(--accent);border-color:var(--accent);color:#07101f;font-weight:600}
-  button:disabled{opacity:.45;cursor:not-allowed}
-  input{background:#0d1017;border:1px solid var(--line);border-radius:6px;
-        color:var(--ink);padding:5px 8px;font-size:12px;width:100%}
-  label{display:block;color:var(--dim);font-size:11px;margin-bottom:3px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
-  .actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-  pre{background:#0d1017;border:1px solid var(--line);border-radius:6px;
-      padding:9px;overflow:auto;margin:8px 0 0;font-size:11.5px;max-height:230px}
-  .empty{color:var(--dim);padding:16px 14px}
-  .esc{border-left:3px solid var(--warn)}
+  body { font: 14px/1.5 system-ui, sans-serif; margin: 32px; max-width: 720px; }
+  h1 { font-size: 16px; }
+  .none { color: #666; }
+  .card { border: 1px solid #ccc; border-left: 4px solid #c80; padding: 12px 14px;
+          margin: 12px 0; }
+  .why { color: #444; }
+  .meta { color: #777; font-family: ui-monospace, monospace; font-size: 12px; }
+  button { margin: 8px 6px 0 0; padding: 5px 10px; }
 </style>
-</head>
-<body>
-<div id="root"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
-<script>
-const html = htm.bind(React.createElement);
-const {useState, useEffect, useCallback} = React;
 
-const api = async (path, opts) => {
-  const r = await fetch(path, {headers: {'content-type': 'application/json'}, ...opts});
-  if (!r.ok) throw new Error((await r.text()).slice(0, 300));
-  return r.json();
+<h1>Operator console</h1>
+<p class="none">
+  Deliberately a mock. What is real is underneath it: the run pauses, the person works in
+  the same live browser session the automation was using, and the automation resumes from
+  where it stopped. This page is only the button that triggers that.
+</p>
+
+<div id="list">Loading…</div>
+
+<script>
+const api = (path, body) => fetch(path, body
+  ? {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(body)}
+  : undefined).then(r => r.json());
+
+const act = async (runId, path, decision) => {
+  await api(`/api/interventions/${runId}/${path}`, {decision, operator: 'operator'});
+  render();
 };
 
-const CATEGORY_TAG = {SUCCESS: 'ok', BUSINESS: 'biz', RECOVERABLE: 'warn', HARD: 'bad'};
-
-function Capability({cap, onChange}) {
-  const [params, setParams] = useState(() => {
-    const seed = {};
-    for (const [k, v] of Object.entries(cap.input_schema.properties || {}))
-      seed[k] = (v.examples && v.examples[0] != null) ? String(v.examples[0]) : '';
-    return seed;
-  });
-  const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState(null);
-
-  const invoke = async (attended) => {
-    setBusy(true); setResult(null);
-    try {
-      const body = {params, allow_risky: true, attended};
-      setResult(await api(`/api/capabilities/${cap.capability_id}/invoke`,
-        {method: 'POST', body: JSON.stringify(body)}));
-    } catch (e) { setResult({error: String(e.message)}); }
-    finally { setBusy(false); onChange(); }
-  };
-
-  const approve = async (revoke) => {
-    await api(`/api/capabilities/${cap.capability_id}/${revoke ? 'revoke' : 'approve'}`,
-      {method: 'POST', body: JSON.stringify({approved_by: 'reviewer@mendota'})});
-    onChange();
-  };
-
-  const gate = cap.requires_approval
-    ? (cap.approved ? html`<span class="tag ok">approved</span>`
-                    : html`<span class="tag warn">draft · replay blocked</span>`)
-    : html`<span class="tag">read-only · no approval needed</span>`;
-
-  return html`<div class="row">
-    <div class="name">${cap.name} ${gate}</div>
-    <div class="muted mono">${cap.capability_id}@${cap.version} · ${cap.steps} steps
-      ${cap.commits_state ? ' · changes state' : ''}
-      ${cap.provenance ? ` · ${cap.provenance.planner}` : ''}
-      ${cap.provenance && cap.provenance.steps_by_tier
-        ? ` · tiers ${JSON.stringify(cap.provenance.steps_by_tier)}` : ''}</div>
-    <div class="grid" style="margin-top:10px">
-      ${Object.keys(cap.input_schema.properties || {}).map(k => html`
-        <div key=${k}>
-          <label>${k}</label>
-          <input value=${params[k] ?? ''}
-                 onInput=${e => setParams({...params, [k]: e.target.value})}/>
-        </div>`)}
-    </div>
-    <div class="actions">
-      <button class="primary" disabled=${busy} onClick=${() => invoke(false)}>
-        ${busy ? 'running…' : 'Invoke'}</button>
-      <button disabled=${busy} onClick=${() => invoke(true)}>Invoke (attended)</button>
-      ${cap.requires_approval && !cap.approved
-        ? html`<button onClick=${() => approve(false)}>Approve</button>`
-        : cap.requires_approval
-          ? html`<button onClick=${() => approve(true)}>Revoke approval</button>` : null}
-    </div>
-    ${result ? html`<pre>${JSON.stringify(result, null, 2)}</pre>` : null}
-  </div>`;
+async function render() {
+  const items = await api('/api/interventions');
+  const list = document.getElementById('list');
+  if (!items.length) { list.innerHTML = '<p class="none">Nothing is waiting on a human.</p>'; return; }
+  list.innerHTML = '';
+  for (const i of items) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `<b>${i.code}</b> — ${i.state}
+      <div class="why">${i.reason}</div>
+      <div class="meta">${i.capability_id} · step ${i.step_id || '—'} · ${i.frame_url || ''}</div>`;
+    const add = (label, path, decision) => {
+      const b = document.createElement('button');
+      b.textContent = label;
+      b.onclick = () => act(i.run_id, path, decision);
+      card.appendChild(b);
+    };
+    if (i.state === 'PAUSED') {
+      add('Take control', 'take', '');
+    } else {
+      add('Continue', 'resume', 'CONTINUE');
+      add('Retry the step', 'resume', 'RETRY_STEP');
+      add('I did it manually', 'resume', 'HUMAN_COMPLETED');
+      add('Abort', 'resume', 'ABORT');
+    }
+    list.appendChild(card);
+  }
 }
-
-function Interventions({items, onChange}) {
-  const act = async (runId, path, body) => {
-    await api(`/api/interventions/${runId}/${path}`,
-      {method: 'POST', body: JSON.stringify(body)});
-    onChange();
-  };
-  if (!items.length)
-    return html`<div class="empty">Nothing waiting on a human.</div>`;
-  return items.map(i => html`<div class="row esc" key=${i.escalation_id}>
-    <div class="name">${i.code} <span class="tag warn">${i.state}</span></div>
-    <div class="muted">${i.reason}</div>
-    <div class="muted mono">step ${i.step_id || '—'} · ${i.frame_url || ''}</div>
-    <div class="actions">
-      ${i.state === 'PAUSED'
-        ? html`<button class="primary"
-                 onClick=${() => act(i.run_id, 'take', {decision: '', operator: 'operator'})}>
-                 Take control</button>`
-        : html`
-          <button onClick=${() => act(i.run_id, 'resume', {decision: 'CONTINUE', operator: 'operator'})}>Continue</button>
-          <button onClick=${() => act(i.run_id, 'resume', {decision: 'RETRY_STEP', operator: 'operator'})}>Retry step</button>
-          <button onClick=${() => act(i.run_id, 'resume', {decision: 'HUMAN_COMPLETED', operator: 'operator'})}>I did it manually</button>
-          <button onClick=${() => act(i.run_id, 'resume', {decision: 'ABORT', operator: 'operator'})}>Abort</button>`}
-    </div>
-  </div>`);
-}
-
-function Runs({runs}) {
-  if (!runs.length) return html`<div class="empty">No runs yet.</div>`;
-  return runs.map(r => html`<div class="row" key=${r.run_id}>
-    <div>
-      <span class="tag ${CATEGORY_TAG[r.category] || ''}">${r.category || r.state}</span>
-      <span class="mono"> ${r.code || ''}</span>
-      ${r.escalated ? html`<span class="tag warn"> escalated</span>` : null}
-    </div>
-    <div class="muted mono">${r.run_id}</div>
-    <div class="muted">
-      ${r.duration_ms != null ? `${r.duration_ms}ms` : 'live'}
-      ${r.llm_calls != null ? ` · ${r.llm_calls} llm calls` : ''}
-      ${r.stability != null ? ` · ${Math.round(r.stability * 100)}% first-choice locators` : ''}
-      ${r.outcome ? ` · ${r.outcome}` : ''}
-      ${r.outputs && Object.keys(r.outputs).length ? ` · ${JSON.stringify(r.outputs)}` : ''}
-    </div>
-  </div>`);
-}
-
-function App() {
-  const [caps, setCaps] = useState([]);
-  const [runs, setRuns] = useState([]);
-  const [escs, setEscs] = useState([]);
-
-  const refresh = useCallback(async () => {
-    try {
-      const [c, r, e] = await Promise.all([
-        api('/api/capabilities'), api('/api/runs?limit=15'), api('/api/interventions')]);
-      setCaps(c); setRuns(r); setEscs(e);
-    } catch (_) { /* the console should not die because one poll failed */ }
-  }, []);
-
-  useEffect(() => { refresh(); const t = setInterval(refresh, 2000); return () => clearInterval(t); }, [refresh]);
-
-  return html`
-    <header>
-      <h1>aihands</h1>
-      <span class="sub">record once with a model · replay deterministically · hand to a human when stuck</span>
-    </header>
-    <main>
-      <div style="display:grid;gap:16px">
-        <section>
-          <h2>Capabilities</h2>
-          ${caps.length ? caps.map(c => html`<${Capability} key=${c.capability_id} cap=${c} onChange=${refresh}/>`)
-                        : html`<div class="empty">No capabilities recorded yet.</div>`}
-        </section>
-      </div>
-      <div style="display:grid;gap:16px">
-        <section>
-          <h2>Needs a human</h2>
-          <${Interventions} items=${escs} onChange=${refresh}/>
-        </section>
-        <section>
-          <h2>Recent runs</h2>
-          <${Runs} runs=${runs}/>
-        </section>
-      </div>
-    </main>`;
-}
-
-ReactDOM.createRoot(document.getElementById('root')).render(html`<${App}/>`);
+render();
+setInterval(render, 3000);
 </script>
-</body>
-</html>

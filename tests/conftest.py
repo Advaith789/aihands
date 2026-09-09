@@ -81,7 +81,24 @@ def capability():
 
 
 @pytest.fixture
-def approved(capability):
+def approved_capability(capability):
+    """A signed copy, built here rather than read from disk -- a test should
+    not depend on whether the checked-in artifact happens to be signed."""
+    from datetime import datetime, timezone
+    from aihands.schema.capability import Approval
+    return capability.model_copy(update={"approval": Approval(
+        status="approved", approved_by="test@mendota",
+        approved_at=datetime.now(timezone.utc).isoformat(),
+        approved_steps_hash=capability.steps_hash())})
+
+
+@pytest.fixture
+def approved(approved_capability):
+    return approved_capability
+
+
+@pytest.fixture
+def _unused_approved(capability):
     from datetime import datetime, timezone
     from aihands.schema.capability import Approval
     return capability.model_copy(update={"approval": Approval(

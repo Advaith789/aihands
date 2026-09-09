@@ -33,9 +33,13 @@ def new_run_id(kind: str) -> str:
 
 class RunRecorder:
     def __init__(self, run_id: str, root: Path | None = None,
-                 redactor: Redactor | None = None) -> None:
+                 redactor: Redactor | None = None, dirname: str | None = None) -> None:
+        # The run id has to be unique -- it identifies one execution forever.
+        # The directory name is read by people, and for the curated evidence set
+        # a timestamp and six hex characters are noise in front of the only part
+        # that matters, which is what the run was demonstrating.
         self.run_id = run_id
-        self.dir = (root or EVIDENCE_ROOT) / run_id
+        self.dir = (root or EVIDENCE_ROOT) / (dirname or run_id)
         self.dir.mkdir(parents=True, exist_ok=True)
         self.redactor = redactor or Redactor()
         self._log_path = self.dir / "log.jsonl"

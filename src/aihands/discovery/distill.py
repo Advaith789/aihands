@@ -117,6 +117,17 @@ def _url_checkpoint(entry: TraceEntry, params: dict[str, Any],
                      frame_path=frame_path)
 
 
+def _output_description(trace: DiscoveryTrace, name: str) -> str:
+    """Describe an output by the label it was actually read from, so a caller
+    reading the catalogue sees the institution's own wording."""
+    for entry in trace.entries:
+        if entry.tool == "read" and entry.into == name and entry.status == "ok":
+            label = (entry.control or {}).get("label") or (entry.control or {}).get("name")
+            if label:
+                return f"{label}, read from the confirmation screen"
+    return ""
+
+
 def _checkpoints(entry: TraceEntry, params: dict[str, Any],
                  frame_path: tuple[str, ...]) -> tuple[Condition, ...]:
     """What must be true for this step to have worked.
@@ -135,6 +146,88 @@ def _checkpoints(entry: TraceEntry, params: dict[str, Any],
         conditions.append(Condition(kind="text_present", value=entry.landmark_after,
                                     frame_path=frame_path))
     return tuple(conditions)
+
+
+# ---------------------------------------------------------------------------
+# Inferring the input contract
+# ---------------------------------------------------------------------------
+
+_SECRET_WORDS = re.compile(r"(?i)\b(password|passcode|pin|secret|token|ssn|security)\b")
+
+
+def _shape(value: str) -> str | None:
+    r"""Generalise a recorded value into the pattern of values like it.
+
+    "M-1001" describes one member. `M-\d{4}` describes the shape every member id
+    on this system has, which is what a caller needs in order to know what is
+    valid before spending a browser session finding out. Only emitted for values
+    that actually have a structure -- a free-text note has no shape worth
+    asserting, and a wrong pattern is worse than none because it rejects valid
+    input.
+    """
+    parts, structured = [], False
+    for run in re.findall(r"[A-Za-z]+|\d+|[^A-Za-z\d]+", value):
+        if run.isdigit():
+            # \d+ rather than \d{4}. We have exactly one example; inferring an
+            # exact length from it is overfitting, and a pattern that rejects a
+            # valid member id is worse than no pattern at all.
+            parts.append(r"\d+")
+            structured = True
+        elif run.isalpha():
+            # Letters are held literally: an id prefix like "M-" or "CLM-" is
+            # part of the format, not a variable field.
+            parts.append(re.escape(run))
+        else:
+            parts.append(re.escape(run))
+            structured = True
+    if not structured or len(value) > 24:
+        return None
+    if not any(c.isdigit() for c in value):
+        return None
+    return "".join(parts)
+
+
+def _infer_inputs(trace: DiscoveryTrace) -> dict[str, dict[str, Any]]:
+    """Work out the parameter contract from what the run actually did.
+
+    Everything here is read off the recording rather than declared by hand:
+    which screen a value was typed on, what the field was called, what the
+    value looked like. The caller can still override any of it, but the default
+    should not be "untyped string with no description".
+    """
+    entry_screen = urlparse(trace.entry_url).path
+    inferred: dict[str, dict[str, Any]] = {}
+
+    for name, value in trace.params.items():
+        text = str(value)
+        spec: dict[str, Any] = {}
+
+        used = next((e for e in trace.entries
+                     if e.tool == "fill" and e.status == "ok" and text in str(e.value)), None)
+
+        # A value typed on the entry screen, before the flow has gone anywhere,
+        # is a credential -- that screen is the sign-in screen by definition.
+        # This is why an operator id is treated as sensitive without anyone
+        # having to remember to say so.
+        on_entry = bool(used and urlparse(used.url_before).path == entry_screen)
+        field_type = (used.control or {}).get("type", "") if used else ""
+        field_name = (used.control or {}).get("name", "") if used else ""
+        if field_type == "password" or on_entry or _SECRET_WORDS.search(f"{name} {field_name}"):
+            spec["sensitive"] = True
+
+        if re.fullmatch(r"-?\d+(\.\d+)?", text.replace(",", "").lstrip("$")):
+            spec["type"] = "number"
+        elif not spec.get("sensitive"):
+            # A pattern on a credential would leak its shape into the artifact,
+            # which is the one place a secret's shape should not be written down.
+            pattern = _shape(text)
+            if pattern:
+                spec["pattern"] = pattern
+
+        if used and used.intent:
+            spec["description"] = used.intent[0].upper() + used.intent[1:]
+        inferred[name] = spec
+    return inferred
 
 
 def _load_outcomes(app: str) -> tuple[list[KnownOutcome], tuple[str, ...]]:
@@ -217,13 +310,28 @@ def distill_capability(
             "the run produced no verifiable checkpoint, so the capability could "
             "never confirm it reached the state it claims")
 
-    specs = input_specs or {}
-    inputs = tuple(
-        InputSpec(name=key, example=value, **specs.get(key, {}))
-        for key, value in params.items()
-    )
+    # Inferred from the run, then overridden by anything the caller stated.
+    # The operator always has the last word; they simply should not have to
+    # write down what the recording already shows.
+    inferred = _infer_inputs(trace)
+    overrides = input_specs or {}
+    inputs = []
+    for key, value in params.items():
+        spec = {**inferred.get(key, {}), **overrides.get(key, {})}
+        if spec.get("sensitive"):
+            # An example is a convenience for a caller. For a credential it is
+            # a disclosure, and the artifact is the one file that gets committed.
+            example = None
+        elif spec.get("type") == "number":
+            example = float(str(value).replace(",", "").lstrip("$"))
+        else:
+            example = value
+        inputs.append(InputSpec(name=key, example=example, **spec))
+    inputs = tuple(inputs)
     outputs = tuple(
-        OutputSpec(name=out, description=f"Captured from the {out.replace('_', ' ')} field")
+        OutputSpec(name=out,
+                   description=_output_description(trace, out) or
+                               f"Read from the {out.replace('_', ' ')} field")
         for out in trace.declared_outputs if out in reads
     )
     outcomes, _ = _load_outcomes(app)

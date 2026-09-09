@@ -1,0 +1,13 @@
+{
+  "code": "UNEXPECTED_INTERSTITIAL",
+  "reason": "A second approver is required for this amount.",
+  "step_id": "s8",
+  "capability_ref": "<redacted:0e4874f4>",
+  "goal": "Open a savings sub-account for a member",
+  "frame_url": "http://127.0.0.1:8099/member/M-1005/subaccount",
+  "evidence": {
+    "screenshot": "/Users/advaith789/Documents/agentic-ai/aihands/evidence/runs/11_stopped_needs_a_human/escalation_s8.png",
+    "observation": "/Users/advaith789/Documents/agentic-ai/aihands/evidence/runs/11_stopped_needs_a_human/escalation_s8.observation.txt",
+    "dom_snapshot": "/Users/advaith789/Documents/agentic-ai/aihands/evidence/runs/11_stopped_needs_a_human/escalation_s8.dom.html"
+  }
+}

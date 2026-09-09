@@ -430,7 +430,11 @@ class ReplayEngine:
             code=code.value, reason=reason, step_id=step.id if step else None,
             capability_ref=cap.ref, goal=self.goal,
             frame_url=await self._content_url(), evidence=evidence)
-        self.recorder.write_json(f"{esc.escalation_id}.json", esc.to_dict())
+        # Numbered rather than named by id: a reviewer opening the directory
+        # should see which intervention came first, not a hex string. The id
+        # itself is still inside the file.
+        self.recorder.write_json(
+            f"escalation_{len(self.control.escalations):02d}.json", esc.to_dict())
         self.recorder.log("escalation.resolved", escalation=esc.escalation_id,
                           decision=esc.decision.value if esc.decision else None,
                           operator=esc.operator, human_actions=len(esc.human_actions))

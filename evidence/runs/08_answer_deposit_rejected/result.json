@@ -1,0 +1,87 @@
+{
+  "run_id": "08_answer_deposit_rejected_20260909T020346Z_159880",
+  "capability_id": "mendota.member.open_savings_subaccount",
+  "capability_version": "1.0.0",
+  "started_at": "2026-09-09T02:03:46.406862+00:00",
+  "duration_ms": 518,
+  "category": "BUSINESS",
+  "code": "VALIDATION_REJECTED",
+  "outputs": {},
+  "outcome": {
+    "name": "deposit_rejected",
+    "code": "VALIDATION_REJECTED",
+    "message": "The institution declined the opening deposit amount.",
+    "detail": {}
+  },
+  "error": null,
+  "steps": [
+    {
+      "step_id": "s1",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 23,
+      "resolved_by": "role_name",
+      "candidate_index": 0
+    },
+    {
+      "step_id": "s2",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 162,
+      "resolved_by": "role_name",
+      "candidate_index": 0
+    },
+    {
+      "step_id": "s3",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 28,
+      "resolved_by": "role_name",
+      "candidate_index": 0
+    },
+    {
+      "step_id": "s4",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 111,
+      "resolved_by": "role_name",
+      "candidate_index": 0
+    },
+    {
+      "step_id": "s5",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 50,
+      "resolved_by": "column_text",
+      "candidate_index": 0
+    },
+    {
+      "step_id": "s6",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 68,
+      "resolved_by": "role_name",
+      "candidate_index": 0
+    },
+    {
+      "step_id": "s7",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 6,
+      "resolved_by": "role_name",
+      "candidate_index": 0
+    }
+  ],
+  "control": {
+    "escalated": false,
+    "escalations": 0,
+    "human_actions": 0,
+    "final_owner": "nobody"
+  },
+  "drift": {
+    "steps_resolved": 8,
+    "first_choice": 8,
+    "fell_back": 0
+  },
+  "llm_calls": 0
+}

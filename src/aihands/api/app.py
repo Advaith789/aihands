@@ -43,10 +43,6 @@ class InvokeRequest(BaseModel):
     attended: bool = False
 
 
-class ApproveRequest(BaseModel):
-    approved_by: str
-
-
 class ResumeRequest(BaseModel):
     decision: str
     operator: str = "operator"
@@ -73,22 +69,11 @@ def build_api(policy_path: str = "policy.yaml") -> FastAPI:
                            "risk": s.risk, "commits": s.commits,
                            "locator": s.target.candidates[0].strategy if s.target else None,
                            "fallbacks": (len(s.target.candidates) - 1) if s.target else 0,
-                           "expect": s.expect.value if s.expect else None}
+                           # A checkpoint is a conjunction: url alone cannot
+                           # tell a receipt from an interstitial at the same url.
+                           "expect": [{"kind": c.kind, "value": c.value}
+                                      for c in s.expect]}
                           for s in cap.steps]}
-
-    @app.post("/api/capabilities/{capability_id}/approve")
-    async def approve(capability_id: str, body: ApproveRequest) -> dict[str, Any]:
-        try:
-            return store.summarise(store.approve(capability_id, body.approved_by))
-        except KeyError:
-            raise HTTPException(404, f"no capability {capability_id!r}")
-
-    @app.post("/api/capabilities/{capability_id}/revoke")
-    async def revoke(capability_id: str) -> dict[str, Any]:
-        try:
-            return store.summarise(store.revoke(capability_id))
-        except KeyError:
-            raise HTTPException(404, f"no capability {capability_id!r}")
 
     # ---------------- invocation ----------------
 
@@ -171,29 +156,6 @@ def build_api(policy_path: str = "policy.yaml") -> FastAPI:
             run.control.record_human_action(action)
         run.control.hand_back(decision, body.operator)
         return {"run_id": run_id, "state": run.state(), "decision": decision.value}
-
-    @app.get("/api/runs")
-    async def runs(limit: int = 25) -> list[dict[str, Any]]:
-        live = [{"run_id": r.run_id, "capability_id": r.capability_id,
-                 "state": r.state(), "live": True, "started_at": r.started_at}
-                for r in registry.all() if r.result is None and r.error is None]
-        return live + store.recent_runs(limit)
-
-    @app.get("/api/runs/{run_id}")
-    async def run_detail(run_id: str) -> dict[str, Any]:
-        import json
-        path = store.EVIDENCE_DIR / run_id / "result.json"
-        if path.exists():
-            return json.loads(path.read_text())
-        try:
-            run = registry.get(run_id)
-        except KeyError:
-            raise HTTPException(404, f"no run {run_id!r}")
-        return {"run_id": run_id, "state": run.state(), "live": True,
-                "escalations": [e.to_dict() for e in run.control.escalations],
-                "transitions": [vars(t) | {"frm": t.frm.value, "to": t.to.value,
-                                           "owner": t.owner.value}
-                                for t in run.control.transitions]}
 
     @app.get("/api/health")
     async def health() -> dict[str, Any]:

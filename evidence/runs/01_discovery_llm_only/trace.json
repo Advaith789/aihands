@@ -1,0 +1,690 @@
+{
+  "goal": "Sign in to the servicing desk, find the member with the given member id, and open a savings sub-account for them with the given opening deposit. Then read the confirmation number from the receipt.",
+  "entry_url": "http://127.0.0.1:8099/login",
+  "planner": "llm",
+  "model": "gpt-4o-mini",
+  "params": {
+    "operator_id": "<redacted:854b2ed9>",
+    "member_id": "M-1001",
+    "deposit": "500"
+  },
+  "declared_outputs": [
+    "confirmation_number"
+  ],
+  "tenant": "",
+  "entries": [
+    {
+      "seq": 1,
+      "tool": "fill",
+      "tier": "llm",
+      "intent": "Fill in the operator ID for sign in.",
+      "rationale": "I need to enter the operator ID to proceed with signing in to the servicing desk.",
+      "ref": "f0:c1",
+      "value": "<redacted:854b2ed9>",
+      "into": "",
+      "url_before": "http://127.0.0.1:8099/login",
+      "url_after": "http://127.0.0.1:8099/login",
+      "frame_path": [],
+      "content_frame_after": [],
+      "control": {
+        "ref": "f0:c1",
+        "role": "textbox",
+        "name": "Operator ID",
+        "context": "",
+        "via": "semantic",
+        "tag": "input",
+        "type": "text",
+        "value": "",
+        "enabled": true,
+        "href": "",
+        "frame_path": []
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "textbox",
+            "name": "Operator ID",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "label",
+            "text": "Operator ID",
+            "confidence": 0.85
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "#op",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 2,
+      "tool": "click",
+      "tier": "llm",
+      "intent": "Sign in to the servicing desk.",
+      "rationale": "I need to sign in to access the member information and perform the required actions.",
+      "ref": "f0:c2",
+      "value": "",
+      "into": "",
+      "url_before": "http://127.0.0.1:8099/login",
+      "url_after": "http://127.0.0.1:8099/desk/main",
+      "frame_path": [],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f0:c2",
+        "role": "button",
+        "name": "Sign In",
+        "context": "",
+        "via": "semantic",
+        "tag": "input",
+        "type": "submit",
+        "value": "Sign In",
+        "enabled": true,
+        "href": "",
+        "frame_path": []
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "button",
+            "name": "Sign In",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "label",
+            "text": "Sign In",
+            "confidence": 0.85
+          },
+          "matched_at_record": 0,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "table > tbody > tr:nth-of-type(2) > td > form > input:nth-of-type(2)",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "",
+      "committed": true,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 3,
+      "tool": "fill",
+      "tier": "llm",
+      "intent": "Enter the member ID to search for the member.",
+      "rationale": "I need to fill in the member ID to find the specific member in the system.",
+      "ref": "f2:c1",
+      "value": "M-1001",
+      "into": "",
+      "url_before": "http://127.0.0.1:8099/desk/main",
+      "url_after": "http://127.0.0.1:8099/desk/main",
+      "frame_path": [
+        "main"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f2:c1",
+        "role": "textbox",
+        "name": "Member ID",
+        "context": "",
+        "via": "semantic",
+        "tag": "input",
+        "type": "text",
+        "value": "",
+        "enabled": true,
+        "href": "",
+        "frame_path": [
+          "main"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "textbox",
+            "name": "Member ID",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "label",
+            "text": "Member ID",
+            "confidence": 0.85
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "#mid",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 4,
+      "tool": "click",
+      "tier": "llm",
+      "intent": "Find the member with the given member ID.",
+      "rationale": "I need to locate the member using the provided member ID before proceeding to open a savings sub-account.",
+      "ref": "f2:c2",
+      "value": "",
+      "into": "",
+      "url_before": "http://127.0.0.1:8099/desk/main",
+      "url_after": "http://127.0.0.1:8099/search?member_id=M-1001",
+      "frame_path": [
+        "main"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f2:c2",
+        "role": "button",
+        "name": "Find Member",
+        "context": "",
+        "via": "semantic",
+        "tag": "input",
+        "type": "submit",
+        "value": "Find Member",
+        "enabled": true,
+        "href": "",
+        "frame_path": [
+          "main"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "button",
+            "name": "Find Member",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "label",
+            "text": "Find Member",
+            "confidence": 0.85
+          },
+          "matched_at_record": 0,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "form > table > tbody > tr > td:nth-of-type(3) > input",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 5,
+      "tool": "click",
+      "tier": "llm",
+      "intent": "Open the member's details for M-1001.",
+      "rationale": "I need to access the member's account to proceed with opening a savings sub-account.",
+      "ref": "f2:c3",
+      "value": "",
+      "into": "",
+      "url_before": "http://127.0.0.1:8099/search?member_id=M-1001",
+      "url_after": "http://127.0.0.1:8099/member/M-1001",
+      "frame_path": [
+        "main"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f2:c3",
+        "role": "clickable",
+        "name": "M-1001",
+        "context": "column \"Member ID\"",
+        "via": "onclick",
+        "tag": "td",
+        "type": "",
+        "value": "",
+        "enabled": true,
+        "href": "",
+        "frame_path": [
+          "main"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "column_text",
+            "text": "M-1001",
+            "column": "Member ID",
+            "confidence": 0.8
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "tr:nth-of-type(2) > td > table > tbody > tr:nth-of-type(2) > td:nth-of-type(1)",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "Member ID",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 6,
+      "tool": "click",
+      "tier": "llm",
+      "intent": "Open the sub-account for the member.",
+      "rationale": "I need to open a savings sub-account for the member with ID M-1001.",
+      "ref": "f2:c1",
+      "value": "",
+      "into": "",
+      "url_before": "http://127.0.0.1:8099/member/M-1001",
+      "url_after": "http://127.0.0.1:8099/member/M-1001/subaccount/new",
+      "frame_path": [
+        "main"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f2:c1",
+        "role": "link",
+        "name": "Open Sub-Account",
+        "context": "",
+        "via": "semantic",
+        "tag": "a",
+        "type": "",
+        "value": "",
+        "enabled": true,
+        "href": "/member/M-1001/subaccount/new",
+        "frame_path": [
+          "main"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "link",
+            "name": "Open Sub-Account",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "link_text",
+            "text": "Open Sub-Account",
+            "confidence": 0.75
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "table > tbody > tr:nth-of-type(2) > td > a",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 7,
+      "tool": "fill",
+      "tier": "llm",
+      "intent": "Enter the opening deposit amount for the new savings sub-account.",
+      "rationale": "I need to fill in the opening deposit amount before submitting the request to create the savings sub-account.",
+      "ref": "f2:c1",
+      "value": "500",
+      "into": "",
+      "url_before": "http://127.0.0.1:8099/member/M-1001/subaccount/new",
+      "url_after": "http://127.0.0.1:8099/member/M-1001/subaccount/new",
+      "frame_path": [
+        "main"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f2:c1",
+        "role": "textbox",
+        "name": "Opening Deposit",
+        "context": "",
+        "via": "semantic",
+        "tag": "input",
+        "type": "text",
+        "value": "",
+        "enabled": true,
+        "href": "",
+        "frame_path": [
+          "main"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "textbox",
+            "name": "Opening Deposit",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "label",
+            "text": "Opening Deposit",
+            "confidence": 0.85
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "#amt",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 8,
+      "tool": "click",
+      "tier": "llm",
+      "intent": "Submit the request to open a savings sub-account.",
+      "rationale": "I have filled in the opening deposit, and now I need to submit the request to proceed with opening the sub-account.",
+      "ref": "f2:c2",
+      "value": "",
+      "into": "",
+      "url_before": "http://127.0.0.1:8099/member/M-1001/subaccount/new",
+      "url_after": "http://127.0.0.1:8099/member/M-1001/subaccount",
+      "frame_path": [
+        "main"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f2:c2",
+        "role": "button",
+        "name": "Submit Request",
+        "context": "",
+        "via": "semantic",
+        "tag": "input",
+        "type": "submit",
+        "value": "Submit Request",
+        "enabled": true,
+        "href": "",
+        "frame_path": [
+          "main"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "button",
+            "name": "Submit Request",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "label",
+            "text": "Submit Request",
+            "confidence": 0.85
+          },
+          "matched_at_record": 0,
+          "reverified": null
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "form > table > tbody > tr:nth-of-type(2) > td > input",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": null
+        }
+      ],
+      "read_value": null,
+      "landmark_after": "Confirmation Number",
+      "committed": true,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 9,
+      "tool": "read",
+      "tier": "llm",
+      "intent": "Read the confirmation number from the receipt.",
+      "rationale": "The confirmation number is needed to complete the goal of opening a savings sub-account.",
+      "ref": "f1:c1",
+      "value": "",
+      "into": "confirmation_number",
+      "url_before": "http://127.0.0.1:8099/member/M-1001/subaccount",
+      "url_after": "http://127.0.0.1:8099/member/M-1001/subaccount",
+      "frame_path": [
+        "sidebar"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f1:c1",
+        "role": "link",
+        "name": "Member Search",
+        "context": "",
+        "via": "semantic",
+        "tag": "a",
+        "type": "",
+        "value": "",
+        "enabled": true,
+        "href": "/desk/main",
+        "frame_path": [
+          "sidebar"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "link",
+            "name": "Member Search",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "link_text",
+            "text": "Member Search",
+            "confidence": 0.75
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "table > tbody > tr:nth-of-type(2) > td > a",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        }
+      ],
+      "read_value": "Member Search",
+      "landmark_after": "Confirmation Number",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    },
+    {
+      "seq": 10,
+      "tool": "read",
+      "tier": "llm",
+      "intent": "Read the member's name to confirm the correct member is displayed.",
+      "rationale": "I need to confirm that the member with ID M-1001 is correctly displayed before proceeding with the account opening.",
+      "ref": "f1:c1",
+      "value": "",
+      "into": "Member",
+      "url_before": "http://127.0.0.1:8099/member/M-1001/subaccount",
+      "url_after": "http://127.0.0.1:8099/member/M-1001/subaccount",
+      "frame_path": [
+        "sidebar"
+      ],
+      "content_frame_after": [
+        "main"
+      ],
+      "control": {
+        "ref": "f1:c1",
+        "role": "link",
+        "name": "Member Search",
+        "context": "",
+        "via": "semantic",
+        "tag": "a",
+        "type": "",
+        "value": "",
+        "enabled": true,
+        "href": "/desk/main",
+        "frame_path": [
+          "sidebar"
+        ]
+      },
+      "probes": [
+        {
+          "locator": {
+            "strategy": "role_name",
+            "role": "link",
+            "name": "Member Search",
+            "exact": true,
+            "confidence": 0.9
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "link_text",
+            "text": "Member Search",
+            "confidence": 0.75
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        },
+        {
+          "locator": {
+            "strategy": "css",
+            "value": "table > tbody > tr:nth-of-type(2) > td > a",
+            "confidence": 0.3
+          },
+          "matched_at_record": 1,
+          "reverified": true
+        }
+      ],
+      "read_value": "Member Search",
+      "landmark_after": "Confirmation Number",
+      "committed": false,
+      "status": "ok",
+      "error": null
+    }
+  ],
+  "status": "complete",
+  "summary": "all declared outputs captured",
+  "llm_calls": 11
+}

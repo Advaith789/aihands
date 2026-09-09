@@ -1,0 +1,39 @@
+{
+  "escalation_id": "esc_cd328f2f",
+  "code": "UNEXPECTED_INTERSTITIAL",
+  "reason": "A second approver is required for this amount.",
+  "step_id": "s8",
+  "capability_ref": "<redacted:0e4874f4>",
+  "goal": "Open a savings sub-account for a member",
+  "frame_url": "http://127.0.0.1:8099/member/M-1005/subaccount",
+  "evidence": {
+    "screenshot": "/Users/advaith789/Documents/agentic-ai/aihands/evidence/runs/12_human_took_over_and_resumed/escalation_s8.png",
+    "observation": "/Users/advaith789/Documents/agentic-ai/aihands/evidence/runs/12_human_took_over_and_resumed/escalation_s8.observation.txt",
+    "dom_snapshot": "/Users/advaith789/Documents/agentic-ai/aihands/evidence/runs/12_human_took_over_and_resumed/escalation_s8.dom.html"
+  },
+  "created_at": "2026-09-09T02:03:52.673397+00:00",
+  "resolved_at": "2026-09-09T02:03:52.751439+00:00",
+  "decision": "CONTINUE",
+  "operator": "operator@mendota",
+  "human_actions": [
+    {
+      "at": "2026-09-09T02:03:52.751421+00:00",
+      "t": 1788919432726,
+      "kind": "change",
+      "tag": "input",
+      "type": "text",
+      "name": "Approver ID",
+      "value": "OP-99",
+      "frame": "main"
+    },
+    {
+      "at": "2026-09-09T02:03:52.751429+00:00",
+      "t": 1788919432727,
+      "kind": "click",
+      "tag": "input",
+      "type": "submit",
+      "name": "Authorise",
+      "frame": "main"
+    }
+  ]
+}

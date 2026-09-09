@@ -65,7 +65,7 @@ def approved(cap: Capability) -> Capability:
 
 async def discovery(label: str, planner, port: int, tenant: str = "") -> tuple:
     reset(port)
-    recorder = RunRecorder(new_run_id(label), root=RUNS)
+    recorder = RunRecorder(new_run_id(label), root=RUNS, dirname=label)
     surface = await WebSurface.launch(headless=True)
     try:
         loop = DiscoveryLoop(surface, planner, recorder, Policy.load(ROOT / "policy.yaml"))
@@ -83,7 +83,7 @@ async def discovery(label: str, planner, port: int, tenant: str = "") -> tuple:
 async def replay(label: str, cap: Capability, params: dict, port: int = 8099,
                  attended: bool = False) -> None:
     reset(port)
-    recorder = RunRecorder(new_run_id(label), root=RUNS)
+    recorder = RunRecorder(new_run_id(label), root=RUNS, dirname=label)
     control = SessionControl(recorder.run_id)
     surface = await WebSurface.launch(headless=True)
     try:
@@ -122,11 +122,11 @@ async def main() -> None:
     print("discovery")
     # The run that satisfies "the discovery run has to be real": no rules
     # anywhere, every decision made by the model against a live surface.
-    await discovery("discovery_llm_only", LLMPlanner(), 8099)
+    await discovery("01_discovery_llm_only", LLMPlanner(), 8099)
     # The same goal through the ladder, for the tier split.
-    trace, _ = await discovery("discovery_ladder", LadderPlanner(LLMPlanner()), 8099)
+    trace, _ = await discovery("02_discovery_ladder", LadderPlanner(LLMPlanner()), 8099)
     # A second institution, where the rules cannot match the renamed fields.
-    await discovery("discovery_presidio", LadderPlanner(LLMPlanner()), 8098, "presidio")
+    await discovery("03_discovery_presidio", LadderPlanner(LLMPlanner()), 8098, "presidio")
 
     capability = distill_capability(
         trace, capability_id=CAP_ID, name="Open a savings sub-account for a member",
@@ -138,20 +138,20 @@ async def main() -> None:
     print(f"  compiled -> {path.relative_to(ROOT)} ({len(capability.steps)} steps, draft)")
 
     print("\nreplay")
-    await replay("replay_draft_refused", capability, {**OP, "member_id": "M-1001",
+    await replay("04_replay_refused_while_draft", capability, {**OP, "member_id": "M-1001",
                                                       "deposit": 500})
     signed = approved(capability)
     path.write_text(json.dumps(signed.model_dump(mode="json"), indent=2))
-    await replay("replay_success", signed, {**OP, "member_id": "M-1001", "deposit": 500})
-    await replay("replay_not_found", signed, {**OP, "member_id": "M-9999", "deposit": 500})
-    await replay("replay_not_permitted", signed, {**OP, "member_id": "M-1002", "deposit": 500})
-    await replay("replay_validation", signed, {**OP, "member_id": "M-1001", "deposit": 10})
-    await replay("replay_transient", signed, {**OP, "member_id": "M-1004", "deposit": 250})
-    await replay("replay_bad_input", signed, {**OP, "member_id": "NOT-AN-ID", "deposit": 500})
-    await replay("replay_escalation", signed, {**OP, "member_id": "M-1005", "deposit": 15000})
-    await replay("replay_handoff", signed, {**OP, "member_id": "M-1005", "deposit": 15000},
+    await replay("05_replay_success", signed, {**OP, "member_id": "M-1001", "deposit": 500})
+    await replay("06_answer_member_not_found", signed, {**OP, "member_id": "M-9999", "deposit": 500})
+    await replay("07_answer_record_not_permitted", signed, {**OP, "member_id": "M-1002", "deposit": 500})
+    await replay("08_answer_deposit_rejected", signed, {**OP, "member_id": "M-1001", "deposit": 10})
+    await replay("09_recovered_from_transient", signed, {**OP, "member_id": "M-1004", "deposit": 250})
+    await replay("10_refused_bad_input", signed, {**OP, "member_id": "NOT-AN-ID", "deposit": 500})
+    await replay("11_stopped_needs_a_human", signed, {**OP, "member_id": "M-1005", "deposit": 15000})
+    await replay("12_human_took_over_and_resumed", signed, {**OP, "member_id": "M-1005", "deposit": 15000},
                  attended=True)
-    await replay("replay_presidio", load_for(signed, "presidio"),
+    await replay("13_same_capability_other_tenant", load_for(signed, "presidio"),
                  {**OP, "member_id": "M-1001", "deposit": 500}, port=8098)
 
     print(f"\n{len(list(RUNS.iterdir()))} runs in evidence/runs/")

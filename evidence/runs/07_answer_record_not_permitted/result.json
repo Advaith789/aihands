@@ -1,0 +1,71 @@
+{
+  "run_id": "07_answer_record_not_permitted_20260909T020345Z_585497",
+  "capability_id": "mendota.member.open_savings_subaccount",
+  "capability_version": "1.0.0",
+  "started_at": "2026-09-09T02:03:45.649047+00:00",
+  "duration_ms": 441,
+  "category": "BUSINESS",
+  "code": "RECORD_NOT_PERMITTED",
+  "outputs": {},
+  "outcome": {
+    "name": "member_not_permitted",
+    "code": "RECORD_NOT_PERMITTED",
+    "message": "This member's record may not be serviced this way.",
+    "detail": {}
+  },
+  "error": null,
+  "steps": [
+    {
+      "step_id": "s1",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 23,
+      "resolved_by": "role_name",
+      "candidate_index": 0
+    },
+    {
+      "step_id": "s2",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 151,
+      "resolved_by": "role_name",
+      "candidate_index": 0
+    },
+    {
+      "step_id": "s3",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 26,
+      "resolved_by": "role_name",
+      "candidate_index": 0
+    },
+    {
+      "step_id": "s4",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 111,
+      "resolved_by": "role_name",
+      "candidate_index": 0
+    },
+    {
+      "step_id": "s5",
+      "status": "ok",
+      "attempts": 1,
+      "duration_ms": 51,
+      "resolved_by": "column_text",
+      "candidate_index": 0
+    }
+  ],
+  "control": {
+    "escalated": false,
+    "escalations": 0,
+    "human_actions": 0,
+    "final_owner": "nobody"
+  },
+  "drift": {
+    "steps_resolved": 6,
+    "first_choice": 6,
+    "fell_back": 0
+  },
+  "llm_calls": 0
+}

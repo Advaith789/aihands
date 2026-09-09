@@ -12,7 +12,7 @@
       "required": true,
       "pattern": null,
       "description": "Operator signing in",
-      "example": "OP-77",
+      "example": null,
       "sensitive": true
     },
     {
@@ -30,7 +30,7 @@
       "required": true,
       "pattern": null,
       "description": "Opening deposit in dollars",
-      "example": "500",
+      "example": 500.0,
       "sensitive": false
     }
   ],
@@ -39,7 +39,7 @@
       "name": "confirmation_number",
       "type": "string",
       "required": true,
-      "description": "Captured from the confirmation number field",
+      "description": "Confirmation Number, read from the confirmation screen",
       "sensitive": false
     }
   ],
@@ -601,12 +601,12 @@
   "approval": {
     "status": "approved",
     "approved_by": "reviewer@mendota",
-    "approved_at": "2026-09-09T00:30:30.200221+00:00",
-    "approved_steps_hash": "0d2ca127339595818593fbe5a6dece2c1d00af53c874f9d0c1399eed79d0508f",
+    "approved_at": "2026-09-09T02:03:43.906945+00:00",
+    "approved_steps_hash": "901c258ba82eda622de2353bb8edbb2762b8a0c597e942f3eed19ee6fef300ab",
     "derived_via_overlay": null
   },
   "provenance": {
-    "recorded_at": "2026-09-09T00:30:29.901250+00:00",
+    "recorded_at": "2026-09-09T02:03:43.616706+00:00",
     "planner": "ladder",
     "model": "gpt-4o-mini",
     "run_id": "",
