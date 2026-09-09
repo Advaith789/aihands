@@ -132,12 +132,12 @@ Two modes, and one file between them.
 ```mermaid
 flowchart TB
   AG["AI agent (not ours)<br/>decides WHAT to do"]
-  AG --> A
-  AG --> B
-  A["MODE A · DISCOVERY<br/>first time — no capability yet<br/>goal in English · model in the loop<br/>slow, costs a few cents"]
-  B["MODE B · REPLAY<br/>every time after<br/>capability id + params · no model at all<br/>fast, free, repeatable"]
-  A -->|succeeds| ART[("THE ARTIFACT — a capability<br/>typed · versioned · JSON on disk")]
-  ART -->|saved once, replayed forever| B
+  AG -->|first time| A
+  AG -->|after that| B
+  A["MODE A · DISCOVERY<br/>goal in English<br/>model in the loop<br/>slow, costs cents"]
+  B["MODE B · REPLAY<br/>id + parameters<br/>no model at all<br/>fast, free, exact"]
+  A -->|succeeds| ART[("THE ARTIFACT<br/>typed · versioned<br/>JSON on disk")]
+  ART -->|replayed forever| B
 ```
 
 **Mode A runs once per job.** You give it a goal in English. A model looks at the screen,
@@ -256,6 +256,13 @@ sequenceDiagram
 ---
 
 ### The distiller
+
+```mermaid
+flowchart LR
+  IN["RECORDING<br/>what happened<br/>once, to M-1001"] --> D["DISTILLER"]
+  D --> OUT["CAPABILITY<br/>what to do again<br/>for any member"]
+  D -.->|a step has no<br/>reliable locator| X["REFUSED<br/>not worth saving"]
+```
 
 The piece between the two modes, and the one that makes a recording reusable. A recording is
 a list of things that happened to one member on one afternoon; a capability is a contract.
