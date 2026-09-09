@@ -148,6 +148,19 @@ def _checkpoints(entry: TraceEntry, params: dict[str, Any],
     return tuple(conditions)
 
 
+def _fill_checkpoint(step_target: Target, value: str,
+                     frame_path: tuple[str, ...]) -> Condition:
+    """A fill navigates nowhere, so nothing about the url can confirm it worked.
+
+    Without this, every step that supplies a parameter was unverified -- replay
+    would type a member id into a box that silently rejected it and carry on
+    searching for nothing. Asserting the box now holds what we typed costs one
+    read and closes that gap.
+    """
+    return Condition(kind="control_value_equals", target=step_target, value=value,
+                     frame_path=frame_path)
+
+
 # ---------------------------------------------------------------------------
 # Inferring the input contract
 # ---------------------------------------------------------------------------
@@ -282,7 +295,8 @@ def distill_capability(
                                              if p.matched_at_record == 1), None)))
 
         if entry.tool == "fill":
-            action: Any = Fill(value=_parameterise(entry.value, params))
+            bound_value = _parameterise(entry.value, params)
+            action: Any = Fill(value=bound_value)
         elif entry.tool == "click":
             action = Click()
         else:
@@ -293,7 +307,9 @@ def distill_capability(
             id=f"s{index}", intent=entry.intent, action=action, target=target,
             # The checkpoint belongs to the frame the URL was read from, which
             # is not necessarily the frame the control lived in.
-            expect=_checkpoints(entry, params, tuple(entry.content_frame_after)),
+            expect=(_checkpoints(entry, params, tuple(entry.content_frame_after))
+                    or ((_fill_checkpoint(target, bound_value, frame),)
+                        if entry.tool == "fill" else ())),
             commits=entry.committed,
             # A step that navigates is worth one retry: the commonest cause of a
             # miss is that the next screen had not rendered yet, and that is

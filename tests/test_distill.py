@@ -106,10 +106,21 @@ def test_an_incomplete_run_never_becomes_a_capability():
         _compile(_trace([_fill()], status="stuck"))
 
 
+def test_a_fill_is_verified_even_though_it_navigates_nowhere():
+    # Typing changes no url, so nothing derived from the url can confirm it.
+    # Without a check of its own, every step that supplies a parameter goes
+    # unverified -- replay would type a member id into a box that silently
+    # rejected it and carry on searching for nothing.
+    cap = _compile(_trace([_fill(url_after="http://127.0.0.1:8099/desk/main")]))
+    assert [c.kind for c in cap.steps[0].expect] == ["control_value_equals"]
+    assert cap.steps[0].expect[0].value == "{{ input.member_id }}"
+
+
 def test_a_run_with_no_checkpoint_is_refused():
-    # Nothing navigated, so nothing can be asserted -- the capability could
-    # never confirm it reached the state it claims.
-    entry = _fill(url_after="http://127.0.0.1:8099/desk/main")
+    # A click that went nowhere and changed nothing: there is no state to
+    # assert, so the capability could never confirm it did anything.
+    entry = _fill(tool="click", value="", intent="click something inert",
+                  url_after="http://127.0.0.1:8099/desk/main")
     with pytest.raises(DistillRefused, match="verifiable checkpoint"):
         _compile(_trace([entry]))
 

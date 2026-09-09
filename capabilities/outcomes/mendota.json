@@ -1,28 +1,73 @@
 {
-  "_comment": "Outcomes are a property of the APPLICATION, not of one flow. Every capability recorded against this product inherits the same vocabulary of answers, so a new capability does not have to rediscover what 'no member found' looks like.",
-  "frame_path": ["main"],
+  "_comment": "Outcomes are a property of the APPLICATION, not of one flow, so every capability recorded against this product inherits the same vocabulary of answers. Where the server's status code says the same thing as the error text, prefer the status: 503 means the same at every tenant and in every language, and the wording on the page does not.",
+  "frame_path": [
+    "main"
+  ],
   "outcomes": [
-    {"name": "member_not_found", "code": "RECORD_NOT_FOUND",
-     "detect": {"kind": "text_present", "value": "No member found"},
-     "message": "No member exists for that id."},
-    {"name": "already_has_savings", "code": "ALREADY_SATISFIED",
-     "detect": {"kind": "text_present", "value": "already holds"},
-     "message": "This member already holds a savings sub-account."},
-    {"name": "member_not_permitted", "code": "RECORD_NOT_PERMITTED",
-     "detect": {"kind": "text_present", "value": "is not permitted for this operator"},
-     "message": "This member's record may not be serviced this way."},
-    {"name": "deposit_rejected", "code": "VALIDATION_REJECTED",
-     "detect": {"kind": "text_present", "value": "Opening deposit must be at least"},
-     "message": "The institution declined the opening deposit amount."},
-    {"name": "dual_approval_required", "code": "UNEXPECTED_INTERSTITIAL",
-     "detect": {"kind": "text_present", "value": "Second Approval Required"},
-     "message": "A second approver is required for this amount."},
-    {"name": "record_service_down", "code": "TRANSIENT_UNAVAILABLE",
-     "detect": {"kind": "text_present", "value": "temporarily unavailable"},
-     "message": "The record service is temporarily unavailable.",
-     "remediate": "reload", "max_attempts": 3},
-    {"name": "session_expired", "code": "SESSION_EXPIRED",
-     "detect": {"kind": "frame_url_matches", "value": "/login"},
-     "message": "The servicing session ended."}
+    {
+      "name": "member_not_found",
+      "code": "RECORD_NOT_FOUND",
+      "detect": {
+        "kind": "text_present",
+        "value": "No member found"
+      },
+      "message": "No member exists for that id."
+    },
+    {
+      "name": "already_has_savings",
+      "code": "ALREADY_SATISFIED",
+      "detect": {
+        "kind": "text_present",
+        "value": "already holds"
+      },
+      "message": "This member already holds a savings sub-account."
+    },
+    {
+      "name": "member_not_permitted",
+      "code": "RECORD_NOT_PERMITTED",
+      "detect": {
+        "kind": "frame_status_is",
+        "value": "403"
+      },
+      "message": "This member's record may not be serviced this way."
+    },
+    {
+      "name": "deposit_rejected",
+      "code": "VALIDATION_REJECTED",
+      "detect": {
+        "kind": "text_present",
+        "value": "Opening deposit must be at least"
+      },
+      "message": "The institution declined the opening deposit amount."
+    },
+    {
+      "name": "dual_approval_required",
+      "code": "UNEXPECTED_INTERSTITIAL",
+      "detect": {
+        "kind": "text_present",
+        "value": "Second Approval Required"
+      },
+      "message": "A second approver is required for this amount."
+    },
+    {
+      "name": "record_service_down",
+      "code": "TRANSIENT_UNAVAILABLE",
+      "detect": {
+        "kind": "frame_status_is",
+        "value": "503"
+      },
+      "message": "The record service is temporarily unavailable.",
+      "remediate": "reload",
+      "max_attempts": 3
+    },
+    {
+      "name": "session_expired",
+      "code": "SESSION_EXPIRED",
+      "detect": {
+        "kind": "frame_url_matches",
+        "value": "/login"
+      },
+      "message": "The servicing session ended."
+    }
   ]
 }

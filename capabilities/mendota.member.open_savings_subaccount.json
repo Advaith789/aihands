@@ -80,7 +80,41 @@
         "describe": "enter the operator id"
       },
       "require": null,
-      "expect": [],
+      "expect": [
+        {
+          "kind": "control_value_equals",
+          "value": "{{ input.operator_id }}",
+          "target": {
+            "candidates": [
+              {
+                "strategy": "role_name",
+                "role": "textbox",
+                "name": "Operator ID",
+                "exact": true,
+                "confidence": 0.9
+              },
+              {
+                "strategy": "label",
+                "text": "Operator ID",
+                "confidence": 0.85
+              },
+              {
+                "strategy": "css",
+                "value": "#op",
+                "confidence": 0.3
+              }
+            ],
+            "frame_path": [],
+            "probe": {
+              "matched_at_record": 1,
+              "reverified": true
+            },
+            "on_ambiguous": "fail",
+            "describe": "enter the operator id"
+          },
+          "frame_path": []
+        }
+      ],
       "retry": null,
       "risk": "safe",
       "timeout_ms": 8000,
@@ -172,7 +206,45 @@
         "describe": "enter the member id"
       },
       "require": null,
-      "expect": [],
+      "expect": [
+        {
+          "kind": "control_value_equals",
+          "value": "{{ input.member_id }}",
+          "target": {
+            "candidates": [
+              {
+                "strategy": "role_name",
+                "role": "textbox",
+                "name": "Member ID",
+                "exact": true,
+                "confidence": 0.9
+              },
+              {
+                "strategy": "label",
+                "text": "Member ID",
+                "confidence": 0.85
+              },
+              {
+                "strategy": "css",
+                "value": "#mid",
+                "confidence": 0.3
+              }
+            ],
+            "frame_path": [
+              "main"
+            ],
+            "probe": {
+              "matched_at_record": 1,
+              "reverified": true
+            },
+            "on_ambiguous": "fail",
+            "describe": "enter the member id"
+          },
+          "frame_path": [
+            "main"
+          ]
+        }
+      ],
       "retry": null,
       "risk": "safe",
       "timeout_ms": 8000,
@@ -370,7 +442,45 @@
         "describe": "enter the deposit"
       },
       "require": null,
-      "expect": [],
+      "expect": [
+        {
+          "kind": "control_value_equals",
+          "value": "{{ input.deposit }}",
+          "target": {
+            "candidates": [
+              {
+                "strategy": "role_name",
+                "role": "textbox",
+                "name": "Opening Deposit",
+                "exact": true,
+                "confidence": 0.9
+              },
+              {
+                "strategy": "label",
+                "text": "Opening Deposit",
+                "confidence": 0.85
+              },
+              {
+                "strategy": "css",
+                "value": "#amt",
+                "confidence": 0.3
+              }
+            ],
+            "frame_path": [
+              "main"
+            ],
+            "probe": {
+              "matched_at_record": 1,
+              "reverified": true
+            },
+            "on_ambiguous": "fail",
+            "describe": "enter the deposit"
+          },
+          "frame_path": [
+            "main"
+          ]
+        }
+      ],
       "retry": null,
       "risk": "safe",
       "timeout_ms": 8000,
@@ -510,8 +620,8 @@
       "name": "member_not_permitted",
       "code": "RECORD_NOT_PERMITTED",
       "detect": {
-        "kind": "text_present",
-        "value": "is not permitted for this operator",
+        "kind": "frame_status_is",
+        "value": "403",
         "target": null,
         "frame_path": [
           "main"
@@ -558,8 +668,8 @@
       "name": "record_service_down",
       "code": "TRANSIENT_UNAVAILABLE",
       "detect": {
-        "kind": "text_present",
-        "value": "temporarily unavailable",
+        "kind": "frame_status_is",
+        "value": "503",
         "target": null,
         "frame_path": [
           "main"
@@ -601,12 +711,12 @@
   "approval": {
     "status": "approved",
     "approved_by": "reviewer@mendota",
-    "approved_at": "2026-09-09T02:03:43.906945+00:00",
-    "approved_steps_hash": "901c258ba82eda622de2353bb8edbb2762b8a0c597e942f3eed19ee6fef300ab",
+    "approved_at": "2026-09-09T03:37:25.645989+00:00",
+    "approved_steps_hash": "649250ac4567e5b872b0fc492019c79ed9ce3e4b5773a0db18f4ba86aec5e3ba",
     "derived_via_overlay": null
   },
   "provenance": {
-    "recorded_at": "2026-09-09T02:03:43.616706+00:00",
+    "recorded_at": "2026-09-09T03:36:47.691302+00:00",
     "planner": "ladder",
     "model": "gpt-4o-mini",
     "run_id": "",

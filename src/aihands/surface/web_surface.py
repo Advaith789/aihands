@@ -162,12 +162,26 @@ class WebSurface:
         self._browser = browser
         self._pw = pw
         self._non_get = 0
+        self._status: dict[tuple[str, ...], int] = {}
         self._capture_on = False
         self._human_actions: list[dict] = []
 
     def _note_request(self, request) -> None:
         if request.method != "GET":
             self._non_get += 1
+
+    def _note_response(self, response) -> None:
+        """Remember the status of each frame's own document.
+
+        Only document responses: an image 404 says nothing about whether the
+        page we are looking at loaded.
+        """
+        try:
+            if response.request.resource_type != "document":
+                return
+            self._status[_frame_path(response.frame)] = response.status
+        except Exception:
+            pass
 
     @property
     def non_get_count(self) -> int:
@@ -187,6 +201,7 @@ class WebSurface:
         # labels would be a heuristic about English; this is the actual request
         # the application made.
         page.on("request", surface._note_request)
+        page.on("response", surface._note_response)
         return surface
 
     async def close(self) -> None:
@@ -404,6 +419,17 @@ class WebSurface:
                 body = ""
             hit = (condition.value or "").lower() in body.lower()
             return hit if kind == "text_present" else not hit
+
+        if kind == "frame_status_is":
+            return self._status.get(tuple(condition.frame_path)) == int(condition.value or 0)
+
+        if kind == "control_value_equals":
+            try:
+                resolution = await self.resolve(condition.target)
+                actual = await resolution.locator.input_value(timeout=2000)
+            except Exception:
+                return False
+            return actual.strip() == (condition.value or "").strip()
 
         if kind in ("control_present", "control_absent"):
             try:

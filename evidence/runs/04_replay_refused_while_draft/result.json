@@ -1,8 +1,8 @@
 {
-  "run_id": "04_replay_refused_while_draft_20260909T020343Z_5fcb79",
+  "run_id": "04_replay_refused_while_draft_20260909T033647Z_ffc0f9",
   "capability_id": "mendota.member.open_savings_subaccount",
   "capability_version": "1.0.0",
-  "started_at": "2026-09-09T02:03:43.889468+00:00",
+  "started_at": "2026-09-09T03:36:47.969042+00:00",
   "duration_ms": 0,
   "category": "HARD",
   "code": "NOT_APPROVED",

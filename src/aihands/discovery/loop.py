@@ -156,6 +156,20 @@ class DiscoveryLoop:
             trace.summary = f"never captured: {context['outputs_remaining']}"
 
         trace.llm_calls = getattr(self.planner, "calls", 0)
+
+        # Sensitivity is worked out from the run itself -- a value typed on the
+        # entry screen is a credential -- but that can only be known once the
+        # run has happened. So apply the same inference the distiller uses
+        # before the trace is written, rather than relying on the caller having
+        # remembered to declare it. Nothing before this point logs a parameter
+        # value, so the trace is the only place it could have escaped.
+        from .distill import _infer_inputs
+        from ..kernel.redaction import Redactor
+        inferred = {k for k, spec in _infer_inputs(trace).items() if spec.get("sensitive")}
+        secrets = {k: str(v) for k, v in params.items()
+                   if k in inferred or k in (sensitive or set())}
+        if secrets:
+            self.recorder.redactor = Redactor(secrets)
         self.recorder.log("discovery.finish", status=trace.status, summary=trace.summary,
                           turns=len(trace.entries), llm_calls=trace.llm_calls,
                           tiers=trace.tier_counts())

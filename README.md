@@ -119,7 +119,7 @@ intervention request.
 ### Tests and evidence
 
 ```bash
-pytest -q                          # 241 tests
+pytest -q                          # 186 tests
 python scripts/make_evidence.py    # regenerates everything in evidence/ from real runs
 ```
 
@@ -128,74 +128,33 @@ python scripts/make_evidence.py    # regenerates everything in evidence/ from re
 ## How it works
 
 ```mermaid
-flowchart LR
-  A[Goal in English] --> B[Discovery<br/>a model drives the UI]
-  B --> C[Trace<br/>what actually happened]
-  C --> D[Distiller]
-  D --> E[(Capability — draft)]
-  E --> F{Human approves}
-  F --> G[Replay<br/>no model, ever]
-  H[AI agent] --> G
-  G --> I[Typed result]
-  G -.->|stuck| J[Human takes the live session]
-  J -.->|hands back| G
+flowchart TB
+  G["A goal, in English"] --> A1
+  A1["MODE A · DISCOVERY<br/>a model drives the real UI<br/>runs once per job"]
+  A1 --> A2["Distil the run into a capability file"]
+  A2 --> Q{"Can it change money?"}
+  Q -->|no| B1
+  Q -->|yes| S["A person reads the steps and signs"]
+  S --> B1
+  B1["MODE B · REPLAY<br/>follow the saved steps<br/>no model, every time after"]
+  B1 --> O["Success · a business answer · or a failure"]
+  B1 -.->|cannot continue| H["A person takes the live session"]
+  H -.->|hands back| B1
 ```
 
-Discovery is expensive and runs once per capability. Replay is free and runs forever. The
-file in the middle is the product.
+Discovery is slow, costs a few cents, and happens **once**. Replay is fast, free, and
+happens forever. The file in the middle is the product.
 
-### The whole system, start to finish
+The reason for the split is not cost, it is **determinism**. A model asked the same
+question twice may answer differently, and nobody lets that near a real account. So the
+model runs once, under supervision, and what it worked out becomes something a reviewer can
+read and a machine can repeat exactly.
 
-```mermaid
-sequenceDiagram
-  autonumber
-  participant Human as Person at the bank
-  participant Discovery
-  participant Model
-  participant App as Legacy app
-  participant Store as Capability file
-  participant Agent as AI agent
-  participant Replay
+---
 
-  Note over Human,Store: Teach it once — this is the only place a model appears
-  Human->>Discovery: here is the goal, in plain English
-  loop until the goal is met
-    Discovery->>App: what is on the screen?
-    App-->>Discovery: controls and values
-    Discovery->>Model: goal + this screen, what next?
-    Model-->>Discovery: one action
-    Discovery->>App: click / type / read
-    Discovery->>Discovery: measure how to find that control again
-  end
-  Discovery->>Store: distil the run into a capability (draft)
+### Teaching it a job — discovery
 
-  Note over Human,Store: A person signs it — only if it can change money
-  Human->>Store: read the steps and approve
-  Store-->>Human: approved, locked to these exact steps
-
-  Note over Agent,Replay: Run it forever — no model from here on
-  Agent->>Replay: invoke(capability, params)
-  Replay->>Store: load it, check the approval still matches
-  loop for each recorded step
-    Replay->>App: find the control, then act
-    App-->>Replay: next screen
-    Replay->>Replay: did the app answer? then check we landed right
-  end
-  Replay-->>Agent: success, business answer, or failure
-
-  opt cannot safely continue
-    Replay->>Human: intervention request + evidence
-    Human->>App: works in the same live session
-    Human-->>Replay: hand back
-    Replay->>Replay: verify, then carry on
-  end
-```
-
-Steps 1–9 happen once per capability and cost a few cents. Steps 10–11 are a
-person reading what the model wrote. Steps 12–17 are what runs in production,
-thousands of times, for nothing.
-
-### Teaching it a job (discovery)
+![Discovery sequence](docs/discovery.png)
 
 ```mermaid
 sequenceDiagram
@@ -221,29 +180,18 @@ sequenceDiagram
   Discovery-->>Person: saved as draft, awaiting approval
 ```
 
-Step 6 is the one that matters: we measure how to find that control again *before* acting
+The model never sees markup — only named controls, and it refers to them by reference. It
+could not write a selector if it wanted to.
+
+Step 6 is the one that matters. We measure how to find that control again *before* acting
 on it, because a click navigates away and the element is gone. A description we never tried
 is a guess.
 
-### Where the data goes
+---
 
-```mermaid
-flowchart TD
-  UI[Legacy UI] -->|screen| P[Perception]
-  P -->|controls + readouts| PL[Planner<br/>rules, then a model]
-  PL -->|one action| EX[Executor]
-  EX -->|click / type / read| UI
-  EX --> TR[Trace + measured locators]
-  TR --> DS[Distiller]
-  DS --> CAP[(Capability file)]
-  PAR[Params from an agent] --> RE[Replay engine]
-  CAP --> RE
-  RE --> UI
-  RE --> RES[Result: success, answer, or failure]
-  RE --> EV[Evidence: log, screenshots]
-```
+### Running it — replay
 
-### One invocation, end to end
+![Replay sequence](docs/replay.png)
 
 ```mermaid
 sequenceDiagram
@@ -272,6 +220,53 @@ sequenceDiagram
     Replay->>Replay: verify, then carry on
   end
   Replay-->>Agent: success, business answer, or failure
+```
+
+Steps 2 and 3 happen before a browser is opened, so a capability that is unapproved, points
+somewhere it should not, or was called with a bad member id costs nothing to refuse.
+
+Inside the loop the order matters: we ask what the application *said* before asserting where
+we *are*. "No member found" is an answer; treating it as a broken assertion would bury a
+routine result in an alert queue.
+
+---
+
+### The distiller
+
+The piece between the two modes, and the one that makes a recording reusable.
+
+A recording is a list of things that happened to one member on one afternoon. A capability
+is a contract. Turning one into the other is four jobs:
+
+| | |
+|---|---|
+| **Parameterise** | `"M-1001"` becomes `{{ input.member_id }}`, and `/member/M-1001` becomes a pattern. Without this the recipe can only ever open one member's record. |
+| **Keep only what was measured** | Every locator was tried against the live page while recording. Anything that matched more than one element is dropped, and if a step has nothing left the whole run is refused rather than saved. |
+| **Derive the checks** | What must be true after each step: the URL we reached, the text only the right screen shows, or — for typing — that the field now holds what we typed. |
+| **Infer the contract** | Types, patterns and descriptions are read off the run. A value typed on the sign-in screen is treated as a credential, so it gets no example and no pattern written into the file. |
+
+It is a pure function with no browser and no model in it, which is why we can improve how
+locators are chosen and re-distil last month's recordings for free — and why the judgement
+that matters most here is testable without a live page.
+
+---
+
+### Where the data goes
+
+```mermaid
+flowchart TD
+  UI[Legacy UI] -->|screen| P[Perception]
+  P -->|controls + readouts| PL[Planner<br/>rules, then a model]
+  PL -->|one action| EX[Executor]
+  EX -->|click / type / read| UI
+  EX --> TR[Trace + measured locators]
+  TR --> DS[Distiller]
+  DS --> CAP[(Capability file)]
+  PAR[Params from an agent] --> RE[Replay engine]
+  CAP --> RE
+  RE --> UI
+  RE --> RES[Result: success, answer, or failure]
+  RE --> EV[Evidence: log, screenshots]
 ```
 
 The design decisions, the trade-offs, and the things I got wrong are in

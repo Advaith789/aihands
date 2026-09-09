@@ -475,6 +475,13 @@ class ReplayEngine:
                         Code.CHECKPOINT_FAILED)
                 continue
             raw = self._values[spec.name]
+            if spec.required and not str(raw).strip():
+                # A read that found the control but came back empty satisfies
+                # the contract on paper and hands the caller nothing. That is a
+                # failure, not a confirmation number.
+                raise AihandsError(
+                    f"output {spec.name!r} was read but is empty",
+                    Code.CHECKPOINT_FAILED)
             try:
                 out[spec.name] = (float(str(raw).replace(",", "").lstrip("$"))
                                   if spec.type == "number" else raw)

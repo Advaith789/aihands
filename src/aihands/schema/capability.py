@@ -162,6 +162,16 @@ class Condition(Base):
         "text_present", "text_absent",
         "control_present", "control_absent",
         "frame_url_matches",
+        # The field now holds what we typed. Typing navigates nowhere, so a
+        # url-derived checkpoint cannot cover a fill -- which left half the
+        # steps in a flow unverified, including every one that supplies a
+        # parameter. This is the cheapest possible assertion: we already know
+        # what we typed and the box will tell us what it holds.
+        "control_value_equals",
+        # The status the server returned for this frame's document. A 503 means
+        # the same thing on every application, in every language, at every
+        # tenant; the words on the error page do not.
+        "frame_status_is",
     ]
     value: str | None = None
     target: Target | None = None
