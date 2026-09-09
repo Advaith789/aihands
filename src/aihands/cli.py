@@ -170,9 +170,30 @@ def _console(args) -> int:
 
 
 def _target_app(args) -> int:
+    """Run the stand-in application.
+
+    It deliberately is not part of the installed package: it stands in for
+    third-party software we do not control, and giving our own code an import
+    path into it would quietly undermine that. So it is imported from the
+    working directory, the way you would run any fixture that ships beside a
+    repository rather than inside it.
+    """
     import uvicorn
+
     os.environ["TENANT"] = args.tenant
-    from target_app.app import create_app
+    try:
+        from target_app.app import create_app
+    except ModuleNotFoundError:
+        # An installed console script does not put the working directory on the
+        # import path, so this is the normal case rather than the exception.
+        sys.path.insert(0, str(Path.cwd()))
+        try:
+            from target_app.app import create_app
+        except ModuleNotFoundError:
+            print("could not find target_app/ — run this from the repository root",
+                  file=sys.stderr)
+            return 2
+
     print(f"{args.tenant}: http://127.0.0.1:{args.port}")
     uvicorn.run(create_app(args.tenant), host="127.0.0.1", port=args.port, log_level="warning")
     return 0

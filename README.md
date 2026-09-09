@@ -13,31 +13,57 @@ described.
 
 ## Setup
 
-Python 3.11+.
+Python 3.11 or newer. Every command below is run **from the repository root**, and the whole
+sequence is verified from a fresh clone into an empty virtualenv.
 
 ```bash
+git clone <this repo> && cd aihands
+
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 playwright install chromium
-
-cp .env.example .env        # put your OPENAI_API_KEY in it; .env is gitignored
 ```
 
-The key is needed for **discovery only**. Replay never reads it, and there is a test that
-walks the import graph to prove the replay path cannot reach a model client at all.
-
-### Start the two institutions
+That is the whole install. Then bring up the two institutions, each in its own terminal:
 
 ```bash
-aihands app --tenant mendota  --port 8099   # Lake Mendota Credit Union   (Madison, WI)
-aihands app --tenant presidio --port 8098   # Presidio Federal CU         (San Francisco)
+aihands app --tenant mendota  --port 8099   # Lake Mendota Credit Union  (Madison, WI)
+aihands app --tenant presidio --port 8098   # Presidio Federal CU        (San Francisco)
 ```
 
-Sign in with any operator id, e.g. `OP-77`. Reset the seeded data any time:
+Open <http://127.0.0.1:8099> and sign in with any operator id, e.g. `OP-77`. Reset the seeded
+records at any point:
 
 ```bash
 curl -X POST http://127.0.0.1:8099/admin/reset
 ```
+
+Confirm the install with the test suite — it starts the target applications itself if they
+are not already running:
+
+```bash
+pytest -q          # 195 tests, about 30 seconds
+```
+
+### About the API key
+
+```bash
+cp .env.example .env        # add your OPENAI_API_KEY; .env is gitignored
+```
+
+**A key is needed for discovery only, and only with `--planner ladder` or `--planner llm`.**
+
+Everything else runs without one:
+
+- `--planner heuristic` records a flow using deterministic rules alone, which is how the whole
+  pipeline stays runnable in CI
+- replay never reads the key — a test walks the live import graph and fails if the replay path
+  can so much as reach a model client, and every result carries `llm_calls` so a caller can
+  check rather than trust
+- the full test suite passes with no key set
+
+Every artifact records which tiers decided which steps, so a run with no model in it can never
+be mistaken for a model-driven one.
 
 ### Records that misbehave, on purpose
 
@@ -119,7 +145,7 @@ intervention request.
 ### Tests and evidence
 
 ```bash
-pytest -q                          # 187 tests
+pytest -q                          # 195 tests
 python scripts/make_evidence.py    # regenerates everything in evidence/ from real runs
 ```
 
